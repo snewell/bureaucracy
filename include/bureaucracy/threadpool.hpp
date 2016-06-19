@@ -3,14 +3,15 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <functional>
 #include <mutex>
 #include <thread>
 #include <vector>
 
+#include <bureaucracy/worker.hpp>
+
 namespace bureaucracy
 {
-    class Threadpool
+    class Threadpool : public Worker
     {
     public:
         Threadpool(std::size_t threads);
@@ -22,15 +23,13 @@ namespace bureaucracy
         Threadpool& operator = (const Threadpool &) = delete;
         Threadpool& operator = (Threadpool &&) = delete;
 
-        using Work = std::function<void () noexcept>;
+        void add(Work work) override;
 
-        void add(Work work);
+        void stop() override;
 
-        void stop();
+        bool isAccepting() const noexcept override;
 
-        bool isAccepting() const noexcept;
-
-        bool isRunning() const noexcept;
+        bool isRunning() const noexcept override;
 
     private:
         std::vector<std::thread> my_threads;

@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(include)
 
 add_library(bureaucracy SHARED
+                serialworker.cpp
                 threadpool.cpp
            )
 set_target_properties(bureaucracy PROPERTIES
@@ -34,6 +35,7 @@ endif()
 
 if(BUILD_TESTS)
     add_executable(bureaucracy_tests
+                        serialworker_test.cpp
                         threadpool_test.cpp
                   )
     target_link_libraries(bureaucracy_tests
@@ -52,6 +54,7 @@ install(TARGETS
        )
 
 install(FILES
+            include/bureaucracy/serialworker.hpp
             include/bureaucracy/threadpool.hpp
         DESTINATION include/bureaucracy
        )
