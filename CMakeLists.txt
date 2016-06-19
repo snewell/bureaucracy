@@ -20,15 +20,29 @@ set_target_properties(bureaucracy PROPERTIES
                         SOVERSION ${PROJECT_VERSION_MAJOR}
                      )
 
-add_executable(bureaucracy_tests
-                    threadpool_test.cpp
-              )
-target_link_libraries(bureaucracy_tests
-                            gtest_main
-                            gtest
+find_library(GTEST gtest)
+find_library(GTEST_MAIN gtest_main)
+
+message(STATUS "gtest location: ${GTEST}")
+message(STATUS "gtest_main location: ${GTEST_MAIN}")
+
+if(GTEST AND GTEST_MAIN)
+    set(BUILD_TESTS ON)
+else()
+    message(WARNING "Could not find gtest libraries; unit tests disabled")
+endif()
+
+if(BUILD_TESTS)
+    add_executable(bureaucracy_tests
+                        threadpool_test.cpp
+                  )
+    target_link_libraries(bureaucracy_tests
+                            ${GTEST}
+                            ${GTEST_MAIN}
                             bureaucracy
-                     )
-add_test(bureaucracy_tests bureaucracy_tests)
+                         )
+    add_test(bureaucracy_tests bureaucracy_tests)
+endif()
 
 install(TARGETS
             bureaucracy
