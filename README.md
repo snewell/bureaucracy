@@ -8,7 +8,7 @@ options that won't be covered her but in most cases the basic usage is
 sufficient.
 
 1. `mkdir <build_dir>`
-2. cd <build_dir>
+2. `cd <build_dir>`
 3. `cmake /path/to/bureaucracy/src`
 4. `make`
 5. (Optional, requires [gtest][2]) `make test`
@@ -22,4 +22,3 @@ compiler flags at configuration time (replced step 3 with something like
 
 [1]: https://cmake.org/ "CMake"
 [2]: https://github.com/google/googletest "gtest"
-
