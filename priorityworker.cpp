@@ -30,23 +30,20 @@ void PriorityWorker::add(Work     work,
             return priority < p.first;
         });
         my_work.emplace(it, std::make_pair(priority, std::move(work)));
-        if(!my_workQueued)
-        {
-            my_worker->add([this]() {
-                std::unique_lock<std::mutex> lock{my_mutex};
-                while(!my_work.empty())
-                {
-                    auto nextItem = my_work.front();
-                    my_work.erase(std::begin(my_work));
-                    lock.unlock();
-                    nextItem.second();
-                    lock.lock();
-                }
-                my_workQueued = false;
+        my_worker->add([this] () {
+            std::unique_lock<std::mutex> lock{my_mutex};
+            auto nextItem = my_work.front();
+            my_work.erase(std::begin(my_work));
+            lock.unlock();
+            nextItem.second();
+            lock.lock();
+            if(my_work.empty())
+            {
                 my_isEmpty.notify_one();
-            });
-            my_workQueued = true;
-        }
+                my_workQueued = false;
+            }
+        });
+        my_workQueued = true;
     }
 }
 

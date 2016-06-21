@@ -40,7 +40,9 @@ TEST(PriorityWorker, test_add)
 
 TEST(PriorityWorker, test_addPriority)
 {
-    Threadpool tp{4};
+    // we're going to use a Threadpool with one thread so we can control when
+    // things fire
+    Threadpool tp{1};
     PriorityWorker pw{tp};
 
     auto value = 0;
