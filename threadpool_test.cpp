@@ -4,9 +4,11 @@
 
 #include <bureaucracy/threadpool.hpp>
 
+using bureaucracy::Threadpool;
+
 TEST(ThreadpoolTest, test_ctor)
 {
-    bureaucracy::Threadpool tp{4};
+    Threadpool tp{4};
 
     ASSERT_EQ(true, tp.isAccepting());
     ASSERT_EQ(true, tp.isRunning());
@@ -14,7 +16,7 @@ TEST(ThreadpoolTest, test_ctor)
 
 TEST(ThreadpoolTest, test_stop)
 {
-    bureaucracy::Threadpool tp{4};
+    Threadpool tp{4};
 
     tp.stop();
     ASSERT_EQ(false, tp.isAccepting());
@@ -23,7 +25,7 @@ TEST(ThreadpoolTest, test_stop)
 
 TEST(ThreadpoolTest, test_work)
 {
-    bureaucracy::Threadpool tp{4};
+    Threadpool tp{4};
 
     std::promise<int> promise;
     auto result = promise.get_future();

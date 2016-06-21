@@ -3,10 +3,13 @@
 #include <bureaucracy/serialworker.hpp>
 #include <bureaucracy/threadpool.hpp>
 
+using bureaucracy::SerialWorker;
+using bureaucracy::Threadpool;
+
 TEST(SerialWorkerTest, test_ctor)
 {
-    bureaucracy::Threadpool tp{4};
-    bureaucracy::SerialWorker sw{tp};
+    Threadpool tp{4};
+    SerialWorker sw{tp};
 
     ASSERT_EQ(true, sw.isAccepting());
     ASSERT_EQ(true, sw.isRunning());
@@ -14,8 +17,8 @@ TEST(SerialWorkerTest, test_ctor)
 
 TEST(SerialWorkerTest, test_stop)
 {
-    bureaucracy::Threadpool tp{4};
-    bureaucracy::SerialWorker sw{tp};
+    Threadpool tp{4};
+    SerialWorker sw{tp};
 
     sw.stop();
     ASSERT_EQ(false, sw.isAccepting());
@@ -35,8 +38,8 @@ namespace
 
 TEST(SerialWorkerTest, test_workOrder)
 {
-    bureaucracy::Threadpool tp{4};
-    bureaucracy::SerialWorker sw{tp};
+    Threadpool tp{4};
+    SerialWorker sw{tp};
 
     auto val = 0;
 
