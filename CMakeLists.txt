@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(include)
 
 add_library(bureaucracy SHARED
+                dilligentworker.cpp
                 priorityworker.cpp
                 serialworker.cpp
                 threadpool.cpp
@@ -35,17 +36,18 @@ else()
 endif()
 
 if(BUILD_TESTS)
-    add_executable(bureaucracy_tests
+    add_executable(worker_tests
+                        dilligentworker_test.cpp
                         priorityworker_test.cpp
                         serialworker_test.cpp
                         threadpool_test.cpp
                   )
-    target_link_libraries(bureaucracy_tests
+    target_link_libraries(worker_tests
                             ${GTEST}
                             ${GTEST_MAIN}
                             bureaucracy
                          )
-    add_test(bureaucracy_tests bureaucracy_tests)
+    add_test(worker_tests worker_tests)
 endif()
 
 install(TARGETS
@@ -56,6 +58,7 @@ install(TARGETS
        )
 
 install(FILES
+            include/bureaucracy/dilligentworker.hpp
             include/bureaucracy/priorityworker.hpp
             include/bureaucracy/serialworker.hpp
             include/bureaucracy/threadpool.hpp

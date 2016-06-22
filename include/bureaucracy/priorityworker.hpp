@@ -17,7 +17,7 @@ namespace bureaucracy
         PriorityWorker(Worker   &worker,
                        Priority  defaultPriority = 0);
 
-        virtual ~PriorityWorker() noexcept;
+        ~PriorityWorker() noexcept;
 
         void add(Work work) override;
 
