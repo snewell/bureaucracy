@@ -17,6 +17,7 @@ add_library(bureaucracy SHARED
                 priorityworker.cpp
                 serialworker.cpp
                 threadpool.cpp
+                timer.cpp
            )
 set_target_properties(bureaucracy PROPERTIES
                         VERSION ${PROJECT_VERSION}
@@ -36,18 +37,25 @@ else()
 endif()
 
 if(BUILD_TESTS)
-    add_executable(worker_tests
-                        dilligentworker_test.cpp
-                        priorityworker_test.cpp
-                        serialworker_test.cpp
-                        threadpool_test.cpp
-                  )
-    target_link_libraries(worker_tests
-                            ${GTEST}
-                            ${GTEST_MAIN}
-                            bureaucracy
-                         )
-    add_test(worker_tests worker_tests)
+    function(create_test name)
+        add_executable(${name} ${ARGN})
+        target_link_libraries(${name}
+                                ${GTEST}
+                                ${GTEST_MAIN}
+                                bureaucracy
+                             )
+        add_test(${name} ${name})
+    endfunction()
+
+    create_test(worker_tests
+                    dilligentworker_test.cpp
+                    priorityworker_test.cpp
+                    serialworker_test.cpp
+                    threadpool_test.cpp
+               )
+    create_test(timer_tests
+                    timer_test.cpp
+               )
 endif()
 
 install(TARGETS
@@ -62,5 +70,6 @@ install(FILES
             include/bureaucracy/priorityworker.hpp
             include/bureaucracy/serialworker.hpp
             include/bureaucracy/threadpool.hpp
+            include/bureaucracy/timer.hpp
         DESTINATION include/bureaucracy
        )
