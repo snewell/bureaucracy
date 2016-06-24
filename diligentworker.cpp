@@ -1,9 +1,9 @@
-#include <bureaucracy/dilligentworker.hpp>
+#include <bureaucracy/diligentworker.hpp>
 
-using bureaucracy::DilligentWorker;
+using bureaucracy::DiligentWorker;
 
-DilligentWorker::DilligentWorker(Worker &worker,
-                                 Alert   alert)
+DiligentWorker::DiligentWorker(Worker &worker,
+                                Alert   alert)
   : my_worker{&worker},
     my_alert{std::move(alert)},
     my_workQueued{0u},
@@ -12,12 +12,12 @@ DilligentWorker::DilligentWorker(Worker &worker,
 {
 }
 
-DilligentWorker::~DilligentWorker() noexcept
+DiligentWorker::~DiligentWorker() noexcept
 {
     stop();
 }
 
-void DilligentWorker::add(Work work)
+void DiligentWorker::add(Work work)
 {
     std::lock_guard<std::mutex> lock{my_mutex};
 
@@ -42,7 +42,7 @@ void DilligentWorker::add(Work work)
     }
 }
 
-void DilligentWorker::stop()
+void DiligentWorker::stop()
 {
     std::unique_lock<std::mutex> lock{my_mutex};
 
@@ -57,13 +57,13 @@ void DilligentWorker::stop()
     }
 }
 
-bool DilligentWorker::isAccepting() const noexcept
+bool DiligentWorker::isAccepting() const noexcept
 {
     std::lock_guard<std::mutex> lock{my_mutex};
     return my_isAccepting;
 }
 
-bool DilligentWorker::isRunning() const noexcept
+bool DiligentWorker::isRunning() const noexcept
 {
     std::lock_guard<std::mutex> lock{my_mutex};
     return my_isRunning;

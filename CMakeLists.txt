@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(include)
 
 set(bureaucracy_srcs
-        dilligentworker.cpp
+        diligentworker.cpp
         priorityworker.cpp
         serialworker.cpp
         threadpool.cpp
@@ -55,7 +55,7 @@ if(BUILD_TESTS)
     endfunction()
 
     create_test(worker_tests
-                    dilligentworker_test.cpp
+                    diligentworker_test.cpp
                     priorityworker_test.cpp
                     serialworker_test.cpp
                     threadpool_test.cpp
@@ -74,7 +74,7 @@ install(TARGETS
        )
 
 install(FILES
-            include/bureaucracy/dilligentworker.hpp
+            include/bureaucracy/diligentworker.hpp
             include/bureaucracy/priorityworker.hpp
             include/bureaucracy/serialworker.hpp
             include/bureaucracy/threadpool.hpp

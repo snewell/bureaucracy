@@ -1,5 +1,5 @@
-#ifndef WORKER_DILLIGENTWORKER_HPP
-#define WORKER_DILLIGENTWORKER_HPP 1
+#ifndef WORKER_DILIGENTWORKER_HPP
+#define WORKER_DILIGENTWORKER_HPP 1
 
 #include <condition_variable>
 #include <functional>
@@ -9,15 +9,15 @@
 
 namespace bureaucracy
 {
-    class DilligentWorker : public Worker
+    class DiligentWorker : public Worker
     {
     public:
         using Alert = std::function<void () noexcept>;
 
-        DilligentWorker(Worker &worker,
+        DiligentWorker(Worker &worker,
                         Alert   alert);
 
-        ~DilligentWorker() noexcept;
+        ~DiligentWorker() noexcept;
 
         void add(Work work) override;
 
