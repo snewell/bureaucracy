@@ -12,16 +12,23 @@ set(CMAKE_CXX_STANDARD 14)
 
 include_directories(include)
 
-add_library(bureaucracy SHARED
-                dilligentworker.cpp
-                priorityworker.cpp
-                serialworker.cpp
-                threadpool.cpp
-                timer.cpp
-           )
+set(bureaucracy_srcs
+        dilligentworker.cpp
+        priorityworker.cpp
+        serialworker.cpp
+        threadpool.cpp
+        timer.cpp
+   )
+
+add_library(bureaucracy SHARED ${bureaucracy_srcs})
 set_target_properties(bureaucracy PROPERTIES
                         VERSION ${PROJECT_VERSION}
                         SOVERSION ${PROJECT_VERSION_MAJOR}
+                     )
+
+add_library(bureaucracy-static STATIC ${bureaucracy_srcs})
+set_target_properties(bureaucracy-static PROPERTIES
+                        OUTPUT_NAME bureaucracy
                      )
 
 find_library(GTEST gtest)
@@ -60,6 +67,7 @@ endif()
 
 install(TARGETS
             bureaucracy
+            bureaucracy-static
             ARCHIVE DESTINATION lib
             LIBRARY DESTINATION lib
             RUNTIME DESTINATION bin
