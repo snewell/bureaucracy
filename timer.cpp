@@ -67,7 +67,7 @@ void Timer::add(Event event,
     {
         auto addFn = [this](std::vector<TimerEvent> &events, Event event, Time due) {
             auto it = std::find_if(std::begin(events), std::end(events), [due](auto const &event) {
-                return due > event.due;
+                return due < event.due;
             });
             events.emplace(it, TimerEvent{std::move(event), due});
         };

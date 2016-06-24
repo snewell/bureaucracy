@@ -23,6 +23,10 @@ namespace bureaucracy
         void add(Event event,
                  Time  due);
 
+        template <typename ...ARGS>
+        void add(Event                          event,
+                 std::chrono::duration<ARGS...> delay);
+
         void stop();
 
         bool isAccepting() const noexcept;
@@ -47,6 +51,13 @@ namespace bureaucracy
         bool my_isRunning;
         bool my_isFiring;
     };
+
+    template <typename ...ARGS>
+    inline void Timer::add(Event                          event,
+                           std::chrono::duration<ARGS...> delay)
+    {
+        add(std::move(event), std::chrono::high_resolution_clock::now() + delay);
+    }
 }
 
 #endif
