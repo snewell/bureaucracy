@@ -65,6 +65,23 @@ if(BUILD_TESTS)
                )
 endif()
 
+find_program(DOXYGEN "doxygen")
+if(DOXYGEN)
+    find_program(DOT "dot")
+    if(DOT)
+        set(HAVE_DOT "YES")
+    else()
+        set(HAVE_DOT "NO")
+    endif()
+    configure_file(doxyfile.in "${CMAKE_CURRENT_BINARY_DIR}/doxyfile" @ONLY)
+
+    add_custom_target(docs)
+    add_custom_command(TARGET docs
+                            COMMAND "${DOXYGEN}"
+                            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+                      )
+endif()
+
 install(TARGETS
             bureaucracy
             bureaucracy-static
