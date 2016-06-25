@@ -23,6 +23,11 @@ void PriorityWorker::add(Work     work,
         });
         workQueue.emplace(it, PriorityWork{priority, std::move(w)});
     });
+    my_worker.addDirect([this]() {
+        auto work = my_worker.getNextItem();
+        work();
+        my_worker.notifyIfEmpty();
+    });
 }
 
 void PriorityWorker::stop()

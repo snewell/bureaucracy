@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <future>
+
 #include <bureaucracy/serialworker.hpp>
 #include <bureaucracy/threadpool.hpp>
 
@@ -47,4 +49,12 @@ TEST(SerialWorker, test_workOrder)
     sw.add(buildExpected(val, 1));
     sw.add(buildExpected(val, 2));
     sw.add(buildExpected(val, 3));
+
+    std::promise<void> hit;
+    sw.add([&val, &hit] () {
+        ASSERT_EQ(4, val);
+        hit.set_value();
+    });
+
+    hit.get_future().get();
 }

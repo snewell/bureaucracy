@@ -9,7 +9,7 @@
 
 namespace bureaucracy
 {
-    template <typename ...DATA>
+    template <typename DATA>
     class WorkerCommon
     {
     public:
@@ -18,11 +18,15 @@ namespace bureaucracy
         template <typename ADDFN>
         void add(ADDFN const &addFn);
 
+        void executeAll() noexcept;
+
         void addDirect(Worker::Work work);
 
         void stop();
 
         void notifyIfEmpty() noexcept;
+
+        DATA getNextItem() noexcept;
 
         bool isAccepting() const noexcept;
 
@@ -36,7 +40,7 @@ namespace bureaucracy
         std::condition_variable my_isEmpty;
         mutable std::mutex my_mutex;
 
-        using WorkQueue = std::vector<DATA...>;
+        using WorkQueue = std::vector<DATA>;
         WorkQueue my_work;
 
         bool my_isAccepting;
@@ -44,50 +48,50 @@ namespace bureaucracy
         bool my_workQueued;
     };
 
-    template <typename ...DATA>
-    inline WorkerCommon<DATA...>::WorkerCommon(Worker &worker)
+    template <typename DATA>
+    inline WorkerCommon<DATA>::WorkerCommon(Worker &worker)
       : my_worker{&worker},
         my_isAccepting{true},
         my_isRunning{true},
         my_workQueued{false} { }
 
-    template <typename ...DATA>
+    template <typename DATA>
     template <typename ADDFN>
-    inline void WorkerCommon<DATA...>::add(ADDFN const &addFn)
+    inline void WorkerCommon<DATA>::add(ADDFN const &addFn)
     {
         std::lock_guard<std::mutex> lock{my_mutex};
 
         if(my_isAccepting)
         {
             addFn(my_work);
-            if(!my_workQueued)
-            {
-                my_worker->add([this]() {
-                    std::unique_lock<std::mutex> lock{my_mutex};
-                    while(!my_work.empty())
-                    {
-                        auto nextItem = my_work.front();
-                        my_work.erase(std::begin(my_work));
-                        lock.unlock();
-                        nextItem();
-                        lock.lock();
-                    }
-                    my_workQueued = false;
-                    my_isEmpty.notify_one();
-                });
-                my_workQueued = true;
-            }
+            my_workQueued = true;
         }
     }
 
-    template <typename ...DATA>
-    inline void WorkerCommon<DATA...>::addDirect(Worker::Work work)
+    template <typename DATA>
+    inline void WorkerCommon<DATA>::executeAll() noexcept
+    {
+        std::unique_lock<std::mutex> lock{my_mutex};
+        while(!my_work.empty())
+        {
+            auto nextItem = my_work.front();
+            my_work.erase(std::begin(my_work));
+            lock.unlock();
+            nextItem();
+            lock.lock();
+        }
+        my_workQueued = false;
+        my_isEmpty.notify_one();
+    }
+
+    template <typename DATA>
+    inline void WorkerCommon<DATA>::addDirect(Worker::Work work)
     {
         my_worker->add(std::move(work));
     }
 
-    template <typename ...DATA>
-    inline void WorkerCommon<DATA...>::stop()
+    template <typename DATA>
+    inline void WorkerCommon<DATA>::stop()
     {
         std::unique_lock<std::mutex> lock{my_mutex};
 
@@ -102,8 +106,8 @@ namespace bureaucracy
         }
     }
 
-    template <typename ...DATA>
-    inline void WorkerCommon<DATA...>::notifyIfEmpty() noexcept
+    template <typename DATA>
+    inline void WorkerCommon<DATA>::notifyIfEmpty() noexcept
     {
         std::unique_lock<std::mutex> lock{my_mutex};
         if(!my_workQueued)
@@ -112,22 +116,32 @@ namespace bureaucracy
         }
     }
 
-    template <typename ...DATA>
-    inline bool WorkerCommon<DATA...>::isAccepting() const noexcept
+    template <typename DATA>
+    inline DATA WorkerCommon<DATA>::getNextItem() noexcept
+    {
+        std::lock_guard<std::mutex> lock{my_mutex};
+        auto ret = my_work.front();
+        my_work.erase(std::begin(my_work));
+        my_workQueued = (my_work.size() != 0);
+        return ret;
+    }
+
+    template <typename DATA>
+    inline bool WorkerCommon<DATA>::isAccepting() const noexcept
     {
         std::lock_guard<std::mutex> lock{my_mutex};
         return my_isAccepting;
     }
 
-    template <typename ...DATA>
-    inline bool WorkerCommon<DATA...>::isRunning() const noexcept
+    template <typename DATA>
+    inline bool WorkerCommon<DATA>::isRunning() const noexcept
     {
         std::lock_guard<std::mutex> lock{my_mutex};
         return my_isRunning;
     }
 
-    template <typename ...DATA>
-    inline bool WorkerCommon<DATA...>::isWorkQueued() const noexcept
+    template <typename DATA>
+    inline bool WorkerCommon<DATA>::isWorkQueued() const noexcept
     {
         std::lock_guard<std::mutex> lock{my_mutex};
         return my_workQueued;
