@@ -84,3 +84,44 @@ TEST(ExpandingThreadpool, test_expandFail)
     hit.get_future().get();
     tp.stop();
 }
+
+TEST(ExpandingThreadpoolNegative, test_invalidThreadCount)
+{
+    try
+    {
+        ExpandingThreadpool{10, 0};
+        FAIL();
+    }
+    catch(std::invalid_argument)
+    {
+        SUCCEED();
+    }
+    catch(...)
+    {
+        FAIL();
+    }
+}
+
+TEST(ExpandingThreadpoolNegative, test_invalidBacklog)
+{
+    try
+    {
+        ExpandingThreadpool{0, 10};
+        FAIL();
+    }
+    catch(std::invalid_argument)
+    {
+        SUCCEED();
+    }
+    catch(...)
+    {
+        FAIL();
+    }
+}
+
+TEST(ExpandingThreadpoolNegative, test_addStopped)
+{
+    ExpandingThreadpool tp{4, 4};
+    tp.stop();
+    ASSERT_THROW(tp.add([]() { }), std::runtime_error);
+}

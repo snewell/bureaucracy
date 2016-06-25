@@ -39,7 +39,7 @@ TEST(Threadpool, test_work)
 
 TEST(ThreadpoolNegative, test_invalidThreadCount)
 {
-    ASSERT_THROW(Threadpool tp{0}, std::invalid_argument);
+    ASSERT_THROW(Threadpool{0}, std::invalid_argument);
 }
 
 TEST(ThreadpoolNegative, test_addStopped)
