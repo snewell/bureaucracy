@@ -59,3 +59,12 @@ TEST(DiligentWorker, test_alert)
 
     cond.wait(lock);
 }
+
+TEST(NegativeDiligentWorker, test_addStopped)
+{
+    Threadpool tp{4};
+    DiligentWorker dw{tp, []() { }};
+    dw.stop();
+
+    ASSERT_THROW(dw.add([] () { }), std::runtime_error);
+}

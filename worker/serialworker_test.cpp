@@ -58,3 +58,39 @@ TEST(SerialWorker, test_workOrder)
 
     hit.get_future().get();
 }
+
+TEST(SerialWorker, test_sequencing)
+{
+    Threadpool tp{4};
+    SerialWorker sw{tp};
+
+    std::promise<void> seqHit;
+    std::promise<void> normHit;
+
+    sw.add([&normHit] () {
+        normHit.get_future().get();
+    });
+    sw.add([&seqHit] () {
+        seqHit.set_value();
+    });
+
+    // sleep for a bit to give Work a chance to run
+    auto future = seqHit.get_future();
+    auto result = future.wait_for(std::chrono::milliseconds(200));
+    ASSERT_EQ(std::future_status::timeout, result);
+
+    tp.add([&normHit]() {
+        normHit.set_value();
+    });
+
+    future.get();
+}
+
+TEST(NegativeSerialWorker, test_addStopped)
+{
+    Threadpool tp{4};
+    SerialWorker sw{tp};
+
+    sw.stop();
+    ASSERT_THROW(sw.add([]() { }), std::runtime_error);
+}

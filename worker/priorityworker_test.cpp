@@ -86,3 +86,12 @@ TEST(PriorityWorker, test_addPriority)
     pw.stop();
     ASSERT_EQ(10, value);
 }
+
+TEST(NegativePriorityWorker, test_addStopped)
+{
+    Threadpool tp{4};
+    PriorityWorker pw{tp};
+
+    pw.stop();
+    ASSERT_THROW(pw.add([]() { }), std::runtime_error);
+}

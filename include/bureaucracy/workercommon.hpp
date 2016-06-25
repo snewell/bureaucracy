@@ -25,9 +25,9 @@ namespace bureaucracy
         template <typename ADDFN>
         void add(ADDFN const &addFn);
 
-        void executeAll() noexcept;
-
         void addDirect(Worker::Work work);
+
+        void executeAll() noexcept;
 
         void stop();
 
@@ -52,15 +52,13 @@ namespace bureaucracy
 
         bool my_isAccepting;
         bool my_isRunning;
-        bool my_workQueued;
     };
 
     template <typename DATA>
     inline WorkerCommon<DATA>::WorkerCommon(Worker &worker)
       : my_worker{&worker},
         my_isAccepting{true},
-        my_isRunning{true},
-        my_workQueued{false} { }
+        my_isRunning{true} { }
 
     template <typename DATA>
     template <typename ADDFN>
@@ -71,7 +69,24 @@ namespace bureaucracy
         if(my_isAccepting)
         {
             addFn(my_work);
-            my_workQueued = true;
+        }
+        else
+        {
+            throw std::runtime_error{"Not accepting work"};
+        }
+    }
+
+    template <typename DATA>
+    inline void WorkerCommon<DATA>::addDirect(Worker::Work work)
+    {
+        // should be locked
+        if(my_isAccepting)
+        {
+            my_worker->add(std::move(work));
+        }
+        else
+        {
+            throw std::runtime_error{"Not accepting work"};
         }
     }
 
@@ -87,14 +102,7 @@ namespace bureaucracy
             nextItem();
             lock.lock();
         }
-        my_workQueued = false;
         my_isEmpty.notify_one();
-    }
-
-    template <typename DATA>
-    inline void WorkerCommon<DATA>::addDirect(Worker::Work work)
-    {
-        my_worker->add(std::move(work));
     }
 
     template <typename DATA>
@@ -105,7 +113,7 @@ namespace bureaucracy
         if(my_isAccepting)
         {
             my_isAccepting = false;
-            if(my_workQueued)
+            if(!my_work.empty())
             {
                 my_isEmpty.wait(lock);
             }
@@ -117,7 +125,7 @@ namespace bureaucracy
     inline void WorkerCommon<DATA>::notifyIfEmpty() noexcept
     {
         std::unique_lock<std::mutex> lock{my_mutex};
-        if(!my_workQueued)
+        if(my_work.empty())
         {
             my_isEmpty.notify_all();
         }
@@ -129,7 +137,6 @@ namespace bureaucracy
         std::lock_guard<std::mutex> lock{my_mutex};
         auto ret = my_work.front();
         my_work.erase(std::begin(my_work));
-        my_workQueued = (my_work.size() != 0);
         return ret;
     }
 
@@ -151,7 +158,7 @@ namespace bureaucracy
     inline bool WorkerCommon<DATA>::isWorkQueued() const noexcept
     {
         std::lock_guard<std::mutex> lock{my_mutex};
-        return my_workQueued;
+        return !(my_work.empty());
     }
     /// \endcond
 }
