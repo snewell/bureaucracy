@@ -12,14 +12,24 @@ ExpandingThreadpool::ExpandingThreadpool(std::size_t maxThreads,
     my_isAccepting{true},
     my_isRunning{true}
 {
+    if(maxThreads == 0)
+    {
+        throw std::invalid_argument{"maxThreads must be non-zero"};
+    }
+    if(maxBacklog == 0)
+    {
+        throw std::invalid_argument{"maxBacklog must be non-zero"};
+    }
     my_threads.reserve(maxThreads);
     expand();
 }
 
+/// \cond false
 ExpandingThreadpool::~ExpandingThreadpool() noexcept
 {
     stop();
 }
+/// \endcond
 
 void ExpandingThreadpool::add(Work work)
 {
@@ -37,7 +47,7 @@ void ExpandingThreadpool::add(Work work)
     }
     else
     {
-        throw std::runtime_error{"ExpandingThreadpool has been stopped"};
+        throw std::runtime_error{"ExpandingThreadpool is not accepting work"};
     }
 }
 

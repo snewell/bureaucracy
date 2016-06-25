@@ -17,7 +17,7 @@ sufficient.
 You'll need a toolchain that supports the C++14 standard (any recent versions
 of gcc or clang should be sufficient).  If you're using a toolchain CMake
 doesn't have built in support for you'll need to provide the appropriate
-compiler flags at configuration time (replced step 3 with something like
+compiler flags at configuration time (replace step 3 with something like
 `cmake -DCMAKE_CXX_FLAGS="-std=c++14" /path/to/bureaucracy/src`).
 
 [1]: https://cmake.org/ "CMake"
