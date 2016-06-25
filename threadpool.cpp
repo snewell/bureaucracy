@@ -1,5 +1,7 @@
 #include <bureaucracy/threadpool.hpp>
 
+#include <exception>
+
 #include <algorithm>
 
 using bureaucracy::Threadpool;
@@ -32,12 +34,33 @@ Threadpool::Threadpool(std::size_t threads)
   : my_isAccepting{true},
     my_isRunning{true}
 {
-    my_threads.reserve(threads);
-    for(auto i = 0u; i < threads; ++i)
+    if(threads == 0)
     {
-        my_threads.emplace_back(std::thread{[this] () {
-            threadWorker(my_isAccepting, my_workReady, my_mutex, my_work);
-        }});
+        throw std::invalid_argument{"threads must be non-zero"};
+    }
+    my_threads.reserve(threads);
+    auto i = 0u;
+    try
+    {
+        for(; i < threads; ++i)
+        {
+            my_threads.emplace_back(std::thread{[this] () {
+                threadWorker(my_isAccepting, my_workReady, my_mutex, my_work);
+            }});
+        }
+    }
+    catch(...)
+    {
+        {
+            std::lock_guard<std::mutex> lock{my_mutex};
+            my_isAccepting = false;
+            my_workReady.notify_all();
+        }
+        for(auto j = 0u; j < i; ++j)
+        {
+            my_threads[j].join();
+        }
+        throw;
     }
 }
 
@@ -49,8 +72,16 @@ Threadpool::~Threadpool() noexcept
 void Threadpool::add(Work work)
 {
     std::lock_guard<std::mutex> lock{my_mutex};
-    my_work.emplace_back(std::move(work));
-    my_workReady.notify_one();
+
+    if(my_isAccepting)
+    {
+        my_work.emplace_back(std::move(work));
+        my_workReady.notify_one();
+    }
+    else
+    {
+        throw std::runtime_error{"Threadpool is not accepting work"};
+    }
 }
 
 void Threadpool::stop()
