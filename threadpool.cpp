@@ -2,31 +2,9 @@
 
 #include <algorithm>
 
+#include "threadpool_internals.hpp"
+
 using bureaucracy::Threadpool;
-
-namespace
-{
-    void threadWorker(bool                                   &accepting,
-                      std::condition_variable                &workReady,
-                      std::mutex                             &mutex,
-                      std::vector<bureaucracy::Worker::Work> &work)
-    {
-        std::unique_lock<std::mutex> lock{mutex};
-
-        while(accepting)
-        {
-            while(!work.empty())
-            {
-                auto nextItem = work.front();
-                work.erase(std::begin(work));
-                lock.unlock();
-                nextItem();
-                lock.lock();
-            }
-            workReady.wait(lock);
-        }
-    }
-}
 
 Threadpool::Threadpool(std::size_t threads)
   : my_isAccepting{true},
@@ -36,7 +14,7 @@ Threadpool::Threadpool(std::size_t threads)
     for(auto i = 0u; i < threads; ++i)
     {
         my_threads.emplace_back(std::thread{[this] () {
-            threadWorker(my_isAccepting, my_workReady, my_mutex, my_work);
+            bureaucracy::internal::threadWorker(my_isAccepting, my_workReady, my_mutex, my_work);
         }});
     }
 }

@@ -2,36 +2,9 @@
 
 #include <algorithm>
 
+#include "threadpool_internals.hpp"
+
 using bureaucracy::ExpandingThreadpool;
-
-namespace
-{
-    void threadWorker(bool                                   &accepting,
-                      std::condition_variable                &workReady,
-                      std::mutex                             &mutex,
-                      std::vector<bureaucracy::Worker::Work> &work)
-    {
-        std::unique_lock<std::mutex> lock{mutex};
-
-        while(accepting)
-        {
-            while(!work.empty())
-            {
-                auto nextItem = work.front();
-                work.erase(std::begin(work));
-                lock.unlock();
-                nextItem();
-                lock.lock();
-            }
-            if(accepting)
-            {
-                // we may have stopped while calling the work functions, check
-                // before waiting
-                workReady.wait(lock);
-            }
-        }
-    }
-}
 
 ExpandingThreadpool::ExpandingThreadpool(std::size_t maxThreads,
                                          std::size_t maxBacklog)
@@ -110,6 +83,6 @@ std::size_t ExpandingThreadpool::spawnedThreads() const noexcept
 void ExpandingThreadpool::expand()
 {
     my_threads.emplace_back(std::thread{[this] () {
-        threadWorker(my_isAccepting, my_workReady, my_mutex, my_work);
+        bureaucracy::internal::threadWorker(my_isAccepting, my_workReady, my_mutex, my_work);
     }});
 }
