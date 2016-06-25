@@ -1,11 +1,8 @@
 #ifndef BUREAUCRACY_SERIALWORKER_HPP
 #define BUREAUCRACY_SERIALWORKER_HPP 1
 
-#include <condition_variable>
-#include <mutex>
-#include <vector>
-
 #include <bureaucracy/worker.hpp>
+#include <bureaucracy/workercommon.hpp>
 
 namespace bureaucracy
 {
@@ -25,16 +22,7 @@ namespace bureaucracy
         bool isRunning() const noexcept override;
 
     private:
-        Worker * const my_worker;
-
-        std::condition_variable my_isEmpty;
-        mutable std::mutex my_mutex;
-
-        std::vector<Work> my_work;
-
-        bool my_isAccepting;
-        bool my_isRunning;
-        bool my_workQueued;
+        WorkerCommon<Work> my_worker;
     };
 }
 

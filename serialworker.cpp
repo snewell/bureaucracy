@@ -3,12 +3,7 @@
 using bureaucracy::SerialWorker;
 
 SerialWorker::SerialWorker(Worker &worker)
-  : my_worker{&worker},
-    my_isAccepting{true},
-    my_isRunning{true},
-    my_workQueued{false}
-{
-}
+  : my_worker{worker} { }
 
 SerialWorker::~SerialWorker() noexcept
 {
@@ -17,54 +12,22 @@ SerialWorker::~SerialWorker() noexcept
 
 void SerialWorker::add(Work work)
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-
-    if(my_isAccepting)
-    {
-        my_work.emplace_back(std::move(work));
-        if(!my_workQueued)
-        {
-            my_worker->add([this]() {
-                std::unique_lock<std::mutex> lock{my_mutex};
-                while(!my_work.empty())
-                {
-                    auto nextItem = my_work.front();
-                    my_work.erase(std::begin(my_work));
-                    lock.unlock();
-                    nextItem();
-                    lock.lock();
-                }
-                my_workQueued = false;
-                my_isEmpty.notify_one();
-            });
-            my_workQueued = true;
-        }
-    }
+    my_worker.add([w = std::move(work)](auto &work) {
+        work.emplace_back(std::move(w));
+    });
 }
 
 void SerialWorker::stop()
 {
-    std::unique_lock<std::mutex> lock{my_mutex};
-
-    if(my_isAccepting)
-    {
-        my_isAccepting = false;
-        if(my_workQueued)
-        {
-            my_isEmpty.wait(lock);
-        }
-        my_isRunning = false;
-    }
+    my_worker.stop();
 }
 
 bool SerialWorker::isAccepting() const noexcept
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-    return my_isAccepting;
+    return my_worker.isAccepting();
 }
 
 bool SerialWorker::isRunning() const noexcept
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-    return my_isRunning;
+    return my_worker.isRunning();
 }

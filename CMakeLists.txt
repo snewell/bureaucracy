@@ -14,6 +14,7 @@ include_directories(include)
 
 set(bureaucracy_srcs
         diligentworker.cpp
+        expandingthreadpool.cpp
         priorityworker.cpp
         serialworker.cpp
         threadpool.cpp
@@ -56,6 +57,7 @@ if(BUILD_TESTS)
 
     create_test(worker_tests
                     diligentworker_test.cpp
+                    expandingthreadpool_test.cpp
                     priorityworker_test.cpp
                     serialworker_test.cpp
                     threadpool_test.cpp

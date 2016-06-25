@@ -1,7 +1,6 @@
 #ifndef BUREAUCRACY_THREADPOOL_HPP
 #define BUREAUCRACY_THREADPOOL_HPP 1
 
-#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
