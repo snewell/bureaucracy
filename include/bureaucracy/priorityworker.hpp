@@ -1,11 +1,8 @@
 #ifndef BUREAUCRACY_PRIORITYWORKER_HPP
 #define BUREAUCRACY_PRIORITYWORKER_HPP 1
 
-#include <condition_variable>
-#include <mutex>
-#include <vector>
-
 #include <bureaucracy/worker.hpp>
+#include <bureaucracy/workercommon.hpp>
 
 namespace bureaucracy
 {
@@ -31,23 +28,27 @@ namespace bureaucracy
         bool isRunning() const noexcept override;
 
     private:
-        Worker * const my_worker;
+        struct PriorityWork
+        {
+            Priority priority;
+            Work work;
 
-        std::condition_variable my_isEmpty;
-        mutable std::mutex my_mutex;
+            void operator() ();
+        };
 
-        std::vector<std::pair<Priority, Work>> my_work;
+        WorkerCommon<PriorityWork> my_worker;
 
         Priority const my_defaultPriority;
-
-        bool my_isAccepting;
-        bool my_isRunning;
-        bool my_workQueued;
     };
 
     inline void PriorityWorker::add(Work work)
     {
         add(std::move(work), my_defaultPriority);
+    }
+
+    inline void PriorityWorker::PriorityWork::operator() ()
+    {
+        work();
     }
 }
 

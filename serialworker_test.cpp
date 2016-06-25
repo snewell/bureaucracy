@@ -6,7 +6,7 @@
 using bureaucracy::SerialWorker;
 using bureaucracy::Threadpool;
 
-TEST(SerialWorkerTest, test_ctor)
+TEST(SerialWorker, test_ctor)
 {
     Threadpool tp{4};
     SerialWorker sw{tp};
@@ -15,7 +15,7 @@ TEST(SerialWorkerTest, test_ctor)
     ASSERT_EQ(true, sw.isRunning());
 }
 
-TEST(SerialWorkerTest, test_stop)
+TEST(SerialWorker, test_stop)
 {
     Threadpool tp{4};
     SerialWorker sw{tp};
@@ -36,7 +36,7 @@ namespace
     }
 }
 
-TEST(SerialWorkerTest, test_workOrder)
+TEST(SerialWorker, test_workOrder)
 {
     Threadpool tp{4};
     SerialWorker sw{tp};
