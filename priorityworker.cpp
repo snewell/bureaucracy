@@ -9,10 +9,12 @@ PriorityWorker::PriorityWorker(Worker   &worker,
   : my_worker{worker},
     my_defaultPriority{defaultPriority} { }
 
+/// \cond false
 PriorityWorker::~PriorityWorker() noexcept
 {
     stop();
 }
+/// \endcond
 
 void PriorityWorker::add(Work     work,
                          Priority priority)

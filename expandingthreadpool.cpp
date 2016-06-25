@@ -24,10 +24,12 @@ ExpandingThreadpool::ExpandingThreadpool(std::size_t maxThreads,
     expand();
 }
 
+/// \cond false
 ExpandingThreadpool::~ExpandingThreadpool() noexcept
 {
     stop();
 }
+/// \endcond
 
 void ExpandingThreadpool::add(Work work)
 {

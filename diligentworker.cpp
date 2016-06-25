@@ -7,10 +7,12 @@ DiligentWorker::DiligentWorker(Worker &worker,
   : my_worker{worker},
     my_alert{std::move(alert)} { }
 
+/// \cond false
 DiligentWorker::~DiligentWorker() noexcept
 {
     stop();
 }
+/// \endcond
 
 void DiligentWorker::add(Work work)
 {

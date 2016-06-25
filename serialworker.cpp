@@ -5,10 +5,12 @@ using bureaucracy::SerialWorker;
 SerialWorker::SerialWorker(Worker &worker)
   : my_worker{worker} { }
 
+/// \cond false
 SerialWorker::~SerialWorker() noexcept
 {
     stop();
 }
+/// \endcond
 
 void SerialWorker::add(Work work)
 {

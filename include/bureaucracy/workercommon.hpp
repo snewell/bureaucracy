@@ -9,6 +9,13 @@
 
 namespace bureaucracy
 {
+    /** \internal
+     *
+     * WorkerCommon contains common functionality required by a number of
+     * Worker implementations; there are no guarantees about functionality.
+     *
+     * \cond false
+     */
     template <typename ...DATA>
     class WorkerCommon
     {
@@ -132,6 +139,7 @@ namespace bureaucracy
         std::lock_guard<std::mutex> lock{my_mutex};
         return my_workQueued;
     }
+    /// \endcond
 }
 
 #endif

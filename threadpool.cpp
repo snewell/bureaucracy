@@ -42,10 +42,12 @@ Threadpool::Threadpool(std::size_t threads)
     }
 }
 
+/// \cond false
 Threadpool::~Threadpool() noexcept
 {
     stop();
 }
+/// \endcond
 
 void Threadpool::add(Work work)
 {
