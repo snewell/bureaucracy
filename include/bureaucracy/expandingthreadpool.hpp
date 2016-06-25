@@ -1,5 +1,5 @@
-#ifndef BUREAUCRACY_THREADPOOL_HPP
-#define BUREAUCRACY_THREADPOOL_HPP 1
+#ifndef BUREAUCRACY_EXPANDINTHREADPOOL_HPP
+#define BUREAUCRACY_EXPANDINTHREADPOOL_HPP 1
 
 #include <condition_variable>
 #include <mutex>
@@ -10,17 +10,13 @@
 
 namespace bureaucracy
 {
-    class Threadpool : public Worker
+    class ExpandingThreadpool : public Worker
     {
     public:
-        Threadpool(std::size_t threads);
+        ExpandingThreadpool(std::size_t maxThreads,
+                            std::size_t maxBacklog);
 
-        ~Threadpool() noexcept;
-
-        Threadpool(const Threadpool &) = delete;
-        Threadpool(Threadpool &&) = delete;
-        Threadpool& operator = (const Threadpool &) = delete;
-        Threadpool& operator = (Threadpool &&) = delete;
+        ~ExpandingThreadpool() noexcept;
 
         void add(Work work) override;
 
@@ -30,12 +26,20 @@ namespace bureaucracy
 
         bool isRunning() const noexcept override;
 
+        std::size_t maxThreads() const noexcept;
+
+        std::size_t spawnedThreads() const noexcept;
+
     private:
+        void expand();
+
         std::vector<std::thread> my_threads;
         std::vector<Work> my_work;
 
         std::condition_variable my_workReady;
         mutable std::mutex my_mutex;
+
+        std::size_t const my_maxBacklog;
 
         bool my_isAccepting;
         bool my_isRunning;

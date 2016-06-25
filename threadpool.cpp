@@ -6,10 +6,10 @@ using bureaucracy::Threadpool;
 
 namespace
 {
-    void threadWorker(bool                          &accepting,
-                      std::condition_variable       &workReady,
-                      std::mutex                    &mutex,
-                      std::vector<Threadpool::Work> &work)
+    void threadWorker(bool                                   &accepting,
+                      std::condition_variable                &workReady,
+                      std::mutex                             &mutex,
+                      std::vector<bureaucracy::Worker::Work> &work)
     {
         std::unique_lock<std::mutex> lock{mutex};
 
