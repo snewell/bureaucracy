@@ -60,7 +60,7 @@ namespace bureaucracy
 
         /** \brief Add an Event that fires after a delay.
          *
-         * Add \p event that fires in \p delay.  This function is equivelent
+         * Add \p event that fires in \p delay.  This function is equivalent
          * to using the the Time version of add where \p due is `now() + due`.
          *
          * \param [in] event

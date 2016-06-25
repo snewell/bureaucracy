@@ -14,7 +14,7 @@ namespace bureaucracy
      *
      * \note DiligentWorker requires checking whether all Work is completed
      *       after each piece of Work completes.  This adds a slight
-     *       perforamnce penalty to each piece of Work processed by a
+     *       performance penalty to each piece of Work processed by a
      *       DiligentWorker.
      */
     class DiligentWorker : public Worker

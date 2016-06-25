@@ -10,7 +10,7 @@ namespace bureaucracy
      *         Work is executed.
      *
      * A SerialWorker executes all its work in order using a single thread.
-     * This ensures Work will not be executd until _all previous_ Work in the
+     * This ensures Work will not be executed until _all previous_ Work in the
      * SerialWorker completes.
      *
      * \warning It's very easy for a SerialWorker to cause starvation if it

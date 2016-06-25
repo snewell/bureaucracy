@@ -54,7 +54,7 @@ namespace bureaucracy
          *      the Work to perform
          *
          * \param [in] priority
-         *      the Prioirty of \p work
+         *      the Priority of \p work
          */
         void add(Work     work,
                  Priority priority);

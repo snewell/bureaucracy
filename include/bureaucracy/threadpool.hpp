@@ -28,7 +28,7 @@ namespace bureaucracy
          *      an invalid size was provided for \p threads
          *
          * \exception std::exception
-         *      an exception was emitted from the standard libray
+         *      an exception was emitted from the standard library
          */
         Threadpool(std::size_t threads);
 
@@ -41,7 +41,7 @@ namespace bureaucracy
          *      the Threadpool is not accepting Work
          *
          * \exception std::exception
-         *      The stanard library may emit exceptions.
+         *      The standard library may emit exceptions.
          */
         void add(Work work) override;
 
