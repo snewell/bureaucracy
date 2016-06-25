@@ -53,10 +53,12 @@ Timer::Timer()
     }};
 }
 
+/// \cond false
 Timer::~Timer() noexcept
 {
     stop();
 }
+/// \endcond
 
 void Timer::add(Event event,
                 Time  due)
