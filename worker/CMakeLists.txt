@@ -4,6 +4,7 @@ set(worker_srcs
         "${CMAKE_CURRENT_SOURCE_DIR}/priorityworker.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/serialworker.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/threadpool.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/threadpoolbase.cpp"
     PARENT_SCOPE)
 
 create_test(worker_tests

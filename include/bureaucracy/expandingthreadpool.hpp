@@ -1,11 +1,7 @@
 #ifndef BUREAUCRACY_EXPANDINTHREADPOOL_HPP
 #define BUREAUCRACY_EXPANDINTHREADPOOL_HPP 1
 
-#include <condition_variable>
-#include <mutex>
-#include <thread>
-#include <vector>
-
+#include <bureaucracy/threadpoolbase.hpp>
 #include <bureaucracy/worker.hpp>
 
 namespace bureaucracy
@@ -91,20 +87,9 @@ namespace bureaucracy
         /// \endcond
 
     private:
-        /** \internal
-         */
-        void expand();
-
-        std::vector<std::thread> my_threads;
-        std::vector<Work> my_work;
-
-        std::condition_variable my_workReady;
-        mutable std::mutex my_mutex;
-
+        ThreadpoolBase my_threadpool;
+       
         std::size_t const my_maxBacklog;
-
-        bool my_isAccepting;
-        bool my_isRunning;
     };
 }
 

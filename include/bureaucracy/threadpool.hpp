@@ -1,11 +1,7 @@
 #ifndef BUREAUCRACY_THREADPOOL_HPP
 #define BUREAUCRACY_THREADPOOL_HPP 1
 
-#include <condition_variable>
-#include <mutex>
-#include <thread>
-#include <vector>
-
+#include <bureaucracy/threadpoolbase.hpp>
 #include <bureaucracy/worker.hpp>
 
 namespace bureaucracy
@@ -61,14 +57,7 @@ namespace bureaucracy
         /// @endcond
 
     private:
-        std::vector<std::thread> my_threads;
-        std::vector<Work> my_work;
-
-        std::condition_variable my_workReady;
-        mutable std::mutex my_mutex;
-
-        bool my_isAccepting;
-        bool my_isRunning;
+        ThreadpoolBase my_threadpool;
     };
 }
 

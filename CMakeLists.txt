@@ -100,6 +100,7 @@ install(FILES
             include/bureaucracy/priorityworker.hpp
             include/bureaucracy/serialworker.hpp
             include/bureaucracy/threadpool.hpp
+            include/bureaucracy/threadpoolbase.hpp
             include/bureaucracy/timer.hpp
             include/bureaucracy/worker.hpp
             include/bureaucracy/workercommon.hpp

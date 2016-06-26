@@ -1,27 +1,17 @@
 #include <bureaucracy/expandingthreadpool.hpp>
 
-#include <algorithm>
-
-#include "threadpool_internals.hpp"
-
 using bureaucracy::ExpandingThreadpool;
 
 ExpandingThreadpool::ExpandingThreadpool(std::size_t maxThreads,
                                          std::size_t maxBacklog)
-  : my_maxBacklog{maxBacklog},
-    my_isAccepting{true},
-    my_isRunning{true}
+  : my_threadpool{maxThreads},
+    my_maxBacklog{maxBacklog}
 {
-    if(maxThreads == 0)
-    {
-        throw std::invalid_argument{"maxThreads must be non-zero"};
-    }
     if(maxBacklog == 0)
     {
-        throw std::invalid_argument{"maxBacklog must be non-zero"};
+        throw std::invalid_argument{"Invalid value for maxBacklog"};
     }
-    my_threads.reserve(maxThreads);
-    expand();
+    my_threadpool.addThread();
 }
 
 /// \cond false
@@ -33,66 +23,38 @@ ExpandingThreadpool::~ExpandingThreadpool() noexcept
 
 void ExpandingThreadpool::add(Work work)
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-
-    if(my_isAccepting)
-    {
-        my_work.emplace_back(std::move(work));
-        my_workReady.notify_one();
-        auto backlog = my_work.size() / my_threads.size();
-        if((backlog > my_maxBacklog) && (my_threads.size() < my_threads.capacity()))
+    my_threadpool.add(std::move(work));
+    my_threadpool.addThreadIf([this] (auto const &work, auto const &threads) {
+        if(threads.size() < threads.capacity())
         {
-            expand();
+            auto const backlog = work.size() / threads.size();
+            return backlog > my_maxBacklog;
         }
-    }
-    else
-    {
-        throw std::runtime_error{"ExpandingThreadpool is not accepting work"};
-    }
+        return false;
+    });
 }
 
 void ExpandingThreadpool::stop()
 {
-    std::unique_lock<std::mutex> lock{my_mutex};
-    if(my_isAccepting)
-    {
-        my_isAccepting = false;
-        my_workReady.notify_all();
-        lock.unlock();
-        std::for_each(std::begin(my_threads), std::end(my_threads), [](auto &thread) {
-            thread.join();
-        });
-        lock.lock();
-        my_isRunning = false;
-    }
+    my_threadpool.stop();
 }
 
 bool ExpandingThreadpool::isAccepting() const noexcept
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-    return my_isAccepting;
+    return my_threadpool.isAccepting();
 }
 
 bool ExpandingThreadpool::isRunning() const noexcept
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-    return my_isRunning;
+    return my_threadpool.isRunning();
 }
 
 std::size_t ExpandingThreadpool::maxThreads() const noexcept
 {
-    return my_threads.capacity();
+    return my_threadpool.getMaxThreads();
 }
 
 std::size_t ExpandingThreadpool::spawnedThreads() const noexcept
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-    return my_threads.size();
-}
-
-void ExpandingThreadpool::expand()
-{
-    my_threads.emplace_back(std::thread{[this] () {
-        bureaucracy::internal::threadWorker(my_isAccepting, my_workReady, my_mutex, my_work);
-    }});
+    return my_threadpool.getAllocatedThreads();
 }
