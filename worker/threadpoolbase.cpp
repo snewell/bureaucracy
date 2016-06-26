@@ -33,6 +33,7 @@ namespace
     }
 }
 
+/// \cond false
 ThreadpoolBase::ThreadpoolBase(std::size_t maxThreads)
   : my_isAccepting{true},
     my_isRunning{true}
@@ -120,3 +121,4 @@ void ThreadpoolBase::addThread()
         throw std::runtime_error{"threads are at capacity"};
     }
 }
+/// \endcond
