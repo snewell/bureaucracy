@@ -46,7 +46,8 @@ Timer::Timer()
                 }
                 else
                 {
-                    my_wakeup.wait_until(lock, (*begin).due);
+                    auto alarm = (*begin).due;
+                    my_wakeup.wait_until(lock, alarm);
                 }
             }
         }

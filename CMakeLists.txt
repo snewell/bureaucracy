@@ -3,7 +3,7 @@ cmake_policy(VERSION 3.0)
 
 project("bureaucracy"
         LANGUAGES CXX
-        VERSION 0.1.0)
+        VERSION 0.1.1)
 
 option(BUILD_TESTS "Build optional tests" ON)
 option(BUILD_DOCS  "Build documenttaion" ON)
