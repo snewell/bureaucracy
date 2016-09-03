@@ -69,10 +69,10 @@ TEST(PriorityWorker, test_addPriority)
     auto value = 0;
     std::mutex m;
     {
-        std::lock_guard<std::mutex> lock{m};
+        std::lock_guard<std::mutex> outerLock{m};
 
         pw.add([&m] () {
-            std::unique_lock<std::mutex> lock{m};
+            std::unique_lock<std::mutex> innerLock{m};
         });
         pw.add([&value]() {
             ASSERT_EQ(5, value);

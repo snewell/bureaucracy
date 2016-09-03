@@ -68,20 +68,20 @@ void Timer::add(Event event,
 
     if(my_isAccepting)
     {
-        auto addFn = [this](std::vector<TimerEvent> &events, Event event, Time due) {
-            auto it = std::find_if(std::begin(events), std::end(events), [due](auto const &event) {
-                return due < event.due;
+        auto addFn = [this, &event](std::vector<TimerEvent> &events, Time newDue) {
+            auto it = std::find_if(std::begin(events), std::end(events), [newDue](auto const &currentEvent) {
+                return newDue < currentEvent.due;
             });
-            events.emplace(it, TimerEvent{std::move(event), due});
+            events.emplace(it, TimerEvent{std::move(event), newDue});
         };
 
         if(my_isFiring)
         {
-            addFn(my_pendingEvents, std::move(event), due);
+            addFn(my_pendingEvents, due);
         }
         else
         {
-            addFn(my_futureEvents, std::move(event), due);
+            addFn(my_futureEvents, due);
             my_wakeup.notify_one();
         }
     }

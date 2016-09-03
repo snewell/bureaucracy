@@ -24,10 +24,10 @@ ExpandingThreadpool::~ExpandingThreadpool() noexcept
 void ExpandingThreadpool::add(Work work)
 {
     my_threadpool.add(std::move(work));
-    my_threadpool.addThreadIf([this] (auto const &work, auto const &threads) {
+    my_threadpool.addThreadIf([this] (auto const &queuedWork, auto const &threads) {
         if(threads.size() < threads.capacity())
         {
-            auto const backlog = work.size() / threads.size();
+            auto const backlog = queuedWork.size() / threads.size();
             return backlog > my_maxBacklog;
         }
         return false;
