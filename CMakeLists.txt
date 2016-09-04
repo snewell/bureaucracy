@@ -5,6 +5,14 @@ project("bureaucracy"
         LANGUAGES CXX
         VERSION 0.1.1)
 
+include(CTest)
+
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+include(CPack)
+
 option(BUILD_TESTS "Build optional tests" ON)
 option(BUILD_DOCS  "Build documenttaion" ON)
 
@@ -14,7 +22,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 14)
 
 include_directories(include)
-
 
 if(BUILD_TESTS)
     find_library(GTEST gtest)
@@ -86,12 +93,16 @@ if(BUILD_DOCS)
     endif()
 endif()
 
+set(runtimeComponent "Runtime")
+set(devComponent "Development")
+
 install(TARGETS
             bureaucracy
             bureaucracy-static
-            ARCHIVE DESTINATION lib
-            LIBRARY DESTINATION lib
-            RUNTIME DESTINATION bin
+            ARCHIVE DESTINATION lib COMPONENT ${devComponent}
+            LIBRARY DESTINATION lib COMPONENT ${runtimeComponent}
+            RUNTIME DESTINATION bin COMPONENT ${runtimeComponent}
+
        )
 
 install(FILES
@@ -105,4 +116,5 @@ install(FILES
             include/bureaucracy/worker.hpp
             include/bureaucracy/workercommon.hpp
         DESTINATION include/bureaucracy
+        COMPONENT ${devComponent}
        )
