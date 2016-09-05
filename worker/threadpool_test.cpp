@@ -37,12 +37,12 @@ TEST(Threadpool, test_work)
     ASSERT_EQ(10, result.get());
 }
 
-TEST(ThreadpoolNegative, test_invalidThreadCount)
+TEST(NegativeThreadpool, test_invalidThreadCount)
 {
     ASSERT_THROW(Threadpool{0}, std::invalid_argument);
 }
 
-TEST(ThreadpoolNegative, test_addStopped)
+TEST(NegativeThreadpool, test_addStopped)
 {
     Threadpool tp{4};
     tp.stop();

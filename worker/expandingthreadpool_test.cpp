@@ -85,7 +85,7 @@ TEST(ExpandingThreadpool, test_expandFail)
     tp.stop();
 }
 
-TEST(ExpandingThreadpoolNegative, test_invalidThreadCount)
+TEST(NegativeExpandingThreadpool, test_invalidThreadCount)
 {
     try
     {
@@ -102,7 +102,7 @@ TEST(ExpandingThreadpoolNegative, test_invalidThreadCount)
     }
 }
 
-TEST(ExpandingThreadpoolNegative, test_invalidBacklog)
+TEST(NegativeExpandingThreadpool, test_invalidBacklog)
 {
     try
     {
@@ -119,7 +119,7 @@ TEST(ExpandingThreadpoolNegative, test_invalidBacklog)
     }
 }
 
-TEST(ExpandingThreadpoolNegative, test_addStopped)
+TEST(NegativeExpandingThreadpool, test_addStopped)
 {
     ExpandingThreadpool tp{4, 4};
     tp.stop();
