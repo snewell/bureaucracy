@@ -42,7 +42,7 @@ if(BUILD_TESTS)
                                 ${GTEST_MAIN}
                                 bureaucracy
                              )
-        add_test(${name} ${name})
+        add_test(${name} ${name} "--gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${name}_results.xml")
     endfunction()
 else()
     function(create_test name)
