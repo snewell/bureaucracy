@@ -20,7 +20,7 @@ Timer::Timer()
             }
             else
             {
-                auto const now = std::chrono::high_resolution_clock::now();
+                auto const now = std::chrono::steady_clock::now();
                 auto begin = std::begin(my_futureEvents);
                 auto const end = std::end(my_futureEvents);
                 auto last = std::find_if(begin, end, [now](auto const &event) {

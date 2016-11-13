@@ -35,7 +35,7 @@ namespace bureaucracy
 
         /** \brief A point in time when an Event can be invoked.
          */
-        using Time = std::chrono::time_point<std::chrono::high_resolution_clock>;
+        using Time = std::chrono::time_point<std::chrono::steady_clock>;
 
         /** \brief Construct a Timer
          */
@@ -57,6 +57,25 @@ namespace bureaucracy
          */
         void add(Event event,
                  Time  due);
+
+        /** \brief Add an Event that fires at a specific time.
+         *
+         * Add \p event to the Timer and invoke it as close to \p due as
+         * possible.  This is a helper function if \p due is not a Time.
+         *
+         * \param [in] event
+         *      an Event to fire when it's \p due
+         *
+         * \param [in] due
+         *      An exact (not relative) time to invoke \p event.  This will be
+         *      converted to a Time.
+         *
+         * \note If \p due is in the past \p event will be fired the next time
+         *       the Timer executes Events.
+         */
+        template <typename CLOCK>
+        void add(Event                          event,
+                 std::chrono::time_point<CLOCK> due);
 
         /** \brief Add an Event that fires after a delay.
          *
@@ -128,11 +147,19 @@ namespace bureaucracy
         bool my_isFiring;
     };
 
+    template <typename CLOCK>
+    inline void Timer::add(Event                          event,
+                           std::chrono::time_point<CLOCK> due)
+    {
+        auto const delay = due - CLOCK::now();
+        add(std::move(event), delay);
+    }
+
     template <typename ...ARGS>
     inline void Timer::add(Event                          event,
                            std::chrono::duration<ARGS...> delay)
     {
-        add(std::move(event), std::chrono::high_resolution_clock::now() + delay);
+        add(std::move(event), std::chrono::steady_clock::now() + delay);
     }
 }
 

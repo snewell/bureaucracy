@@ -29,6 +29,30 @@ TEST(Timer, test_addDue)
     std::promise<void> hit;
     t.add([&hit]() {
         hit.set_value();
+    }, std::chrono::steady_clock::now() + std::chrono::milliseconds(100));
+
+    hit.get_future().get();
+}
+
+TEST(Timer, test_addDueSystem)
+{
+    Timer t;
+
+    std::promise<void> hit;
+    t.add([&hit]() {
+        hit.set_value();
+    }, std::chrono::system_clock::now() + std::chrono::milliseconds(100));
+
+    hit.get_future().get();
+}
+
+TEST(Timer, test_addDueHighResolution)
+{
+    Timer t;
+
+    std::promise<void> hit;
+    t.add([&hit]() {
+        hit.set_value();
     }, std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(100));
 
     hit.get_future().get();
