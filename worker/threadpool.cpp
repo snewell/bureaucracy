@@ -14,7 +14,7 @@ Threadpool::Threadpool(std::size_t threads)
 /// \cond false
 Threadpool::~Threadpool() noexcept
 {
-    stop();
+    Threadpool::stop();
 }
 /// \endcond
 

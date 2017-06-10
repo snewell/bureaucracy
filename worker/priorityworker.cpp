@@ -12,7 +12,7 @@ PriorityWorker::PriorityWorker(Worker   &worker,
 /// \cond false
 PriorityWorker::~PriorityWorker() noexcept
 {
-    stop();
+    PriorityWorker::stop();
 }
 /// \endcond
 

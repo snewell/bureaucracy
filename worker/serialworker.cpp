@@ -8,7 +8,7 @@ SerialWorker::SerialWorker(Worker &worker)
 /// \cond false
 SerialWorker::~SerialWorker() noexcept
 {
-    stop();
+    SerialWorker::stop();
 }
 /// \endcond
 

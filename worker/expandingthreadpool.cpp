@@ -17,7 +17,7 @@ ExpandingThreadpool::ExpandingThreadpool(std::size_t maxThreads,
 /// \cond false
 ExpandingThreadpool::~ExpandingThreadpool() noexcept
 {
-    stop();
+    ExpandingThreadpool::stop();
 }
 /// \endcond
 

@@ -10,7 +10,7 @@ DiligentWorker::DiligentWorker(Worker &worker,
 /// \cond false
 DiligentWorker::~DiligentWorker() noexcept
 {
-    stop();
+    DiligentWorker::stop();
 }
 /// \endcond
 
