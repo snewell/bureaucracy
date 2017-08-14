@@ -5,6 +5,7 @@ project("bureaucracy"
         LANGUAGES CXX
         VERSION 0.1.1)
 
+include(GNUInstallDirs)
 include(CTest)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
@@ -98,9 +99,9 @@ set(devComponent "Development")
 install(TARGETS
             bureaucracy
             bureaucracy-static
-            ARCHIVE DESTINATION lib COMPONENT ${devComponent}
-            LIBRARY DESTINATION lib COMPONENT ${runtimeComponent}
-            RUNTIME DESTINATION bin COMPONENT ${runtimeComponent}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${devComponent}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${runtimeComponent}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${runtimeComponent}
 
        )
 
