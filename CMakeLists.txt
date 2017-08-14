@@ -115,6 +115,6 @@ install(FILES
             include/bureaucracy/timer.hpp
             include/bureaucracy/worker.hpp
             include/bureaucracy/workercommon.hpp
-        DESTINATION include/bureaucracy
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/bureaucracy
         COMPONENT ${devComponent}
        )
