@@ -52,8 +52,8 @@ namespace bureaucracy
 
         Threadpool(const Threadpool &) = delete;
         Threadpool(Threadpool &&) = delete;
-        Threadpool& operator = (const Threadpool &) = delete;
-        Threadpool& operator = (Threadpool &&) = delete;
+        Threadpool & operator=(const Threadpool &) = delete;
+        Threadpool & operator=(Threadpool &&) = delete;
         /// @endcond
 
     private:

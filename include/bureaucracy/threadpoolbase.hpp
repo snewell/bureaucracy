@@ -34,7 +34,7 @@ namespace bureaucracy
         void addThread();
 
         template <typename PREDICATE>
-        void addThreadIf(PREDICATE const &pred);
+        void addThreadIf(PREDICATE const & pred);
 
         std::size_t getMaxThreads() const noexcept;
 
@@ -43,8 +43,8 @@ namespace bureaucracy
         ~ThreadpoolBase() noexcept;
         ThreadpoolBase(ThreadpoolBase const &);
         ThreadpoolBase(ThreadpoolBase &&) noexcept;
-        ThreadpoolBase& operator = (ThreadpoolBase const &);
-        ThreadpoolBase& operator = (ThreadpoolBase &&) noexcept;
+        ThreadpoolBase & operator=(ThreadpoolBase const &);
+        ThreadpoolBase & operator=(ThreadpoolBase &&) noexcept;
 
     private:
         std::vector<std::thread> my_threads;
@@ -58,7 +58,7 @@ namespace bureaucracy
     };
 
     template <typename PREDICATE>
-    inline void ThreadpoolBase::addThreadIf(PREDICATE const &pred)
+    inline void ThreadpoolBase::addThreadIf(PREDICATE const & pred)
     {
         std::lock_guard<std::mutex> lock{my_mutex};
         if(pred(my_work, my_threads))

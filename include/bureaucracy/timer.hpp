@@ -31,7 +31,7 @@ namespace bureaucracy
          *          an Event requires complex work consider using the Event to
          *          feed work into a Worker.
          */
-        using Event = std::function<void () noexcept>;
+        using Event = std::function<void() noexcept>;
 
         /** \brief A point in time when an Event can be invoked.
          */
@@ -55,8 +55,7 @@ namespace bureaucracy
          * \note If \p due is in the past \p event will be fired the next time
          *       the Timer executes Events.
          */
-        void add(Event event,
-                 Time  due);
+        void add(Event event, Time due);
 
         /** \brief Add an Event that fires at a specific time.
          *
@@ -74,8 +73,7 @@ namespace bureaucracy
          *       the Timer executes Events.
          */
         template <typename CLOCK>
-        void add(Event                          event,
-                 std::chrono::time_point<CLOCK> due);
+        void add(Event event, std::chrono::time_point<CLOCK> due);
 
         /** \brief Add an Event that fires after a delay.
          *
@@ -91,9 +89,8 @@ namespace bureaucracy
          * \note If \p delay is negative \p event will be fired the next time
          *       the Timer executes Events.
          */
-        template <typename ...ARGS>
-        void add(Event                          event,
-                 std::chrono::duration<ARGS...> delay);
+        template <typename... ARGS>
+        void add(Event event, std::chrono::duration<ARGS...> delay);
 
         /** \brief Stop accepting Events and terminate the Timer thread
          *
@@ -124,8 +121,8 @@ namespace bureaucracy
         ~Timer() noexcept;
         Timer(Timer const &) = delete;
         Timer(Timer &&) noexcept = delete;
-        Timer& operator = (Timer const &) = delete;
-        Timer& operator = (Timer &&) = delete;
+        Timer & operator=(Timer const &) = delete;
+        Timer & operator=(Timer &&) = delete;
         /// \endcond
 
     private:
@@ -148,16 +145,14 @@ namespace bureaucracy
     };
 
     template <typename CLOCK>
-    inline void Timer::add(Event                          event,
-                           std::chrono::time_point<CLOCK> due)
+    inline void Timer::add(Event event, std::chrono::time_point<CLOCK> due)
     {
         auto const delay = due - CLOCK::now();
         add(std::move(event), delay);
     }
 
-    template <typename ...ARGS>
-    inline void Timer::add(Event                          event,
-                           std::chrono::duration<ARGS...> delay)
+    template <typename... ARGS>
+    inline void Timer::add(Event event, std::chrono::duration<ARGS...> delay)
     {
         add(std::move(event), std::chrono::steady_clock::now() + delay);
     }

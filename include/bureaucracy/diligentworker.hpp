@@ -23,7 +23,7 @@ namespace bureaucracy
         /** \brief A function that's called when A DiligentWorker completes
          *         all it's work.
          */
-        using Alert = std::function<void () noexcept>;
+        using Alert = std::function<void() noexcept>;
 
         /** \brief Construct a DiligentWorker
          *
@@ -37,8 +37,7 @@ namespace bureaucracy
          * \param [in] alert
          *      the Alert to call when all work is completed
          */
-        DiligentWorker(Worker &worker,
-                        Alert   alert);
+        DiligentWorker(Worker & worker, Alert alert);
 
         void add(Work work) override;
 

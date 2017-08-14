@@ -29,7 +29,7 @@ TEST(SerialWorker, test_stop)
 
 namespace
 {
-    auto buildExpected(int &val, int expected)
+    auto buildExpected(int & val, int expected)
     {
         return [&val, expected]() {
             ASSERT_EQ(expected, val);
@@ -51,7 +51,7 @@ TEST(SerialWorker, test_workOrder)
     sw.add(buildExpected(val, 3));
 
     std::promise<void> hit;
-    sw.add([&val, &hit] () {
+    sw.add([&val, &hit]() {
         ASSERT_EQ(4, val);
         hit.set_value();
     });
@@ -67,21 +67,15 @@ TEST(SerialWorker, test_sequencing)
     std::promise<void> seqHit;
     std::promise<void> normHit;
 
-    sw.add([&normHit] () {
-        normHit.get_future().get();
-    });
-    sw.add([&seqHit] () {
-        seqHit.set_value();
-    });
+    sw.add([&normHit]() { normHit.get_future().get(); });
+    sw.add([&seqHit]() { seqHit.set_value(); });
 
     // sleep for a bit to give Work a chance to run
     auto future = seqHit.get_future();
     auto result = future.wait_for(std::chrono::milliseconds(200));
     ASSERT_EQ(std::future_status::timeout, result);
 
-    tp.add([&normHit]() {
-        normHit.set_value();
-    });
+    tp.add([&normHit]() { normHit.set_value(); });
 
     future.get();
 }
@@ -92,5 +86,5 @@ TEST(NegativeSerialWorker, test_addStopped)
     SerialWorker sw{tp};
 
     sw.stop();
-    ASSERT_THROW(sw.add([]() { }), std::runtime_error);
+    ASSERT_THROW(sw.add([]() {}), std::runtime_error);
 }

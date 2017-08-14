@@ -2,10 +2,11 @@
 
 using bureaucracy::DiligentWorker;
 
-DiligentWorker::DiligentWorker(Worker &worker,
-                                Alert   alert)
-  : my_worker{worker},
-    my_alert{std::move(alert)} { }
+DiligentWorker::DiligentWorker(Worker & worker, Alert alert)
+  : my_worker{worker}
+  , my_alert{std::move(alert)}
+{
+}
 
 /// \cond false
 DiligentWorker::~DiligentWorker() noexcept
@@ -16,7 +17,7 @@ DiligentWorker::~DiligentWorker() noexcept
 
 void DiligentWorker::add(Work work)
 {
-    my_worker.addDirect([w = std::move(work), this]() {
+    my_worker.addDirect([ w = std::move(work), this ]() {
         w();
         if(!my_worker.isWorkQueued())
         {

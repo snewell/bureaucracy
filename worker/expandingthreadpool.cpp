@@ -4,8 +4,8 @@ using bureaucracy::ExpandingThreadpool;
 
 ExpandingThreadpool::ExpandingThreadpool(std::size_t maxThreads,
                                          std::size_t maxBacklog)
-  : my_threadpool{maxThreads},
-    my_maxBacklog{maxBacklog}
+  : my_threadpool{maxThreads}
+  , my_maxBacklog{maxBacklog}
 {
     if(maxBacklog == 0)
     {
@@ -24,14 +24,15 @@ ExpandingThreadpool::~ExpandingThreadpool() noexcept
 void ExpandingThreadpool::add(Work work)
 {
     my_threadpool.add(std::move(work));
-    my_threadpool.addThreadIf([this] (auto const &queuedWork, auto const &threads) {
-        if(threads.size() < threads.capacity())
-        {
-            auto const backlog = queuedWork.size() / threads.size();
-            return backlog > my_maxBacklog;
-        }
-        return false;
-    });
+    my_threadpool.addThreadIf(
+        [this](auto const & queuedWork, auto const & threads) {
+            if(threads.size() < threads.capacity())
+            {
+                auto const backlog = queuedWork.size() / threads.size();
+                return backlog > my_maxBacklog;
+            }
+            return false;
+        });
 }
 
 void ExpandingThreadpool::stop()

@@ -4,10 +4,11 @@
 
 using bureaucracy::PriorityWorker;
 
-PriorityWorker::PriorityWorker(Worker   &worker,
-                               Priority  defaultPriority)
-  : my_worker{worker},
-    my_defaultPriority{defaultPriority} { }
+PriorityWorker::PriorityWorker(Worker & worker, Priority defaultPriority)
+  : my_worker{worker}
+  , my_defaultPriority{defaultPriority}
+{
+}
 
 /// \cond false
 PriorityWorker::~PriorityWorker() noexcept
@@ -16,13 +17,12 @@ PriorityWorker::~PriorityWorker() noexcept
 }
 /// \endcond
 
-void PriorityWorker::add(Work     work,
-                         Priority priority)
+void PriorityWorker::add(Work work, Priority priority)
 {
-    my_worker.add([w = std::move(work), priority](auto &workQueue) {
-        auto it = std::find_if(std::begin(workQueue), std::end(workQueue), [priority](auto const &p) {
-            return priority < p.priority;
-        });
+    my_worker.add([ w = std::move(work), priority ](auto & workQueue) {
+        auto it = std::find_if(
+            std::begin(workQueue), std::end(workQueue),
+            [priority](auto const & p) { return priority < p.priority; });
         workQueue.emplace(it, PriorityWork{priority, std::move(w)});
     });
     my_worker.addDirect([this]() {

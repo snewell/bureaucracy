@@ -20,10 +20,10 @@ namespace bureaucracy
     class WorkerCommon
     {
     public:
-        WorkerCommon(Worker &worker);
+        WorkerCommon(Worker & worker);
 
         template <typename ADDFN>
-        void add(ADDFN const &addFn);
+        void add(ADDFN const & addFn);
 
         void addDirect(Worker::Work work);
 
@@ -55,14 +55,16 @@ namespace bureaucracy
     };
 
     template <typename DATA>
-    inline WorkerCommon<DATA>::WorkerCommon(Worker &worker)
-      : my_worker{&worker},
-        my_isAccepting{true},
-        my_isRunning{true} { }
+    inline WorkerCommon<DATA>::WorkerCommon(Worker & worker)
+      : my_worker{&worker}
+      , my_isAccepting{true}
+      , my_isRunning{true}
+    {
+    }
 
     template <typename DATA>
     template <typename ADDFN>
-    inline void WorkerCommon<DATA>::add(ADDFN const &addFn)
+    inline void WorkerCommon<DATA>::add(ADDFN const & addFn)
     {
         std::lock_guard<std::mutex> lock{my_mutex};
 

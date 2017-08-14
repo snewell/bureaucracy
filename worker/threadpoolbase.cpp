@@ -6,10 +6,9 @@ using bureaucracy::ThreadpoolBase;
 
 namespace
 {
-    void threadWorker(bool                                   &accepting,
-                      std::condition_variable                &workReady,
-                      std::mutex                             &mutex,
-                      std::vector<bureaucracy::Worker::Work> &work)
+    void threadWorker(bool & accepting, std::condition_variable & workReady,
+                      std::mutex & mutex,
+                      std::vector<bureaucracy::Worker::Work> & work)
     {
         std::unique_lock<std::mutex> lock{mutex};
 
@@ -35,8 +34,8 @@ namespace
 
 /// \cond false
 ThreadpoolBase::ThreadpoolBase(std::size_t maxThreads)
-  : my_isAccepting{true},
-    my_isRunning{true}
+  : my_isAccepting{true}
+  , my_isRunning{true}
 {
     if(maxThreads == 0)
     {
@@ -75,9 +74,8 @@ void ThreadpoolBase::stop()
         my_isAccepting = false;
         my_workReady.notify_all();
         lock.unlock();
-        std::for_each(std::begin(my_threads), std::end(my_threads), [](auto &thread) {
-            thread.join();
-        });
+        std::for_each(std::begin(my_threads), std::end(my_threads),
+                      [](auto & thread) { thread.join(); });
         lock.lock();
         my_isRunning = false;
     }

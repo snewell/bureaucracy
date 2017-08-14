@@ -38,8 +38,7 @@ namespace bureaucracy
          * \param [in] defaultPriority
          *      the Priority to use if one is not specified in add
          */
-        PriorityWorker(Worker   &worker,
-                       Priority  defaultPriority = 0);
+        PriorityWorker(Worker & worker, Priority defaultPriority = 0);
 
         void add(Work work) override;
 
@@ -56,8 +55,7 @@ namespace bureaucracy
          * \param [in] priority
          *      the Priority of \p work
          */
-        void add(Work     work,
-                 Priority priority);
+        void add(Work work, Priority priority);
 
         void stop() override;
 
@@ -75,7 +73,7 @@ namespace bureaucracy
             Priority priority;
             Work work;
 
-            void operator() ();
+            void operator()();
         };
 
         WorkerCommon<PriorityWork> my_worker;
@@ -88,7 +86,7 @@ namespace bureaucracy
         add(std::move(work), my_defaultPriority);
     }
 
-    inline void PriorityWorker::PriorityWork::operator() ()
+    inline void PriorityWorker::PriorityWork::operator()()
     {
         work();
     }

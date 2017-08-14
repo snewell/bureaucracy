@@ -30,9 +30,7 @@ TEST(Threadpool, test_work)
     std::promise<int> promise;
     auto result = promise.get_future();
 
-    tp.add([&promise]() {
-        promise.set_value(10);
-    });
+    tp.add([&promise]() { promise.set_value(10); });
 
     ASSERT_EQ(10, result.get());
 }
@@ -46,5 +44,5 @@ TEST(NegativeThreadpool, test_addStopped)
 {
     Threadpool tp{4};
     tp.stop();
-    ASSERT_THROW(tp.add([]() { }), std::runtime_error);
+    ASSERT_THROW(tp.add([]() {}), std::runtime_error);
 }

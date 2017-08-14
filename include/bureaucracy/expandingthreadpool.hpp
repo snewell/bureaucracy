@@ -30,8 +30,7 @@ namespace bureaucracy
          * \exception std::exception
          *      an exception was emitted by the standard library
          */
-        ExpandingThreadpool(std::size_t maxThreads,
-                            std::size_t maxBacklog);
+        ExpandingThreadpool(std::size_t maxThreads, std::size_t maxBacklog);
 
         /** \brief Add Work to the ExpandingThreadpool
          *
@@ -82,13 +81,14 @@ namespace bureaucracy
         ~ExpandingThreadpool() noexcept;
         ExpandingThreadpool(ExpandingThreadpool const &) = delete;
         ExpandingThreadpool(ExpandingThreadpool &&) noexcept = delete;
-        ExpandingThreadpool& operator = (ExpandingThreadpool const &) = delete;
-        ExpandingThreadpool& operator = (ExpandingThreadpool &&) noexcept = delete;
+        ExpandingThreadpool & operator=(ExpandingThreadpool const &) = delete;
+        ExpandingThreadpool &
+        operator=(ExpandingThreadpool &&) noexcept = delete;
         /// \endcond
 
     private:
         ThreadpoolBase my_threadpool;
-       
+
         std::size_t const my_maxBacklog;
     };
 }

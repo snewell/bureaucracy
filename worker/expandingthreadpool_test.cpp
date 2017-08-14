@@ -32,9 +32,7 @@ TEST(ExpandingThreadpool, test_work)
     std::promise<int> promise;
     auto result = promise.get_future();
 
-    tp.add([&promise]() {
-        promise.set_value(10);
-    });
+    tp.add([&promise]() { promise.set_value(10); });
 
     ASSERT_EQ(10, result.get());
 }
@@ -46,12 +44,12 @@ TEST(ExpandingThreadpool, test_expand)
     std::promise<void> hit;
     tp.add([&tp, &hit]() {
         // backlog = 0
-        tp.add([] () { });
+        tp.add([]() {});
         // backlog = 1
-        tp.add([] () { });
+        tp.add([]() {});
         // backlog = 2
         ASSERT_EQ(1, tp.spawnedThreads());
-        tp.add([] () { });
+        tp.add([]() {});
         // backlog = 3
         ASSERT_EQ(2, tp.spawnedThreads());
 
@@ -69,12 +67,12 @@ TEST(ExpandingThreadpool, test_expandFail)
     std::promise<void> hit;
     tp.add([&tp, &hit]() {
         // backlog = 0
-        tp.add([] () { });
+        tp.add([]() {});
         // backlog = 1
-        tp.add([] () { });
+        tp.add([]() {});
         // backlog = 2
         ASSERT_EQ(1, tp.spawnedThreads());
-        tp.add([] () { });
+        tp.add([]() {});
         // backlog = 3
         ASSERT_EQ(1, tp.spawnedThreads());
 
@@ -123,5 +121,5 @@ TEST(NegativeExpandingThreadpool, test_addStopped)
 {
     ExpandingThreadpool tp{4, 4};
     tp.stop();
-    ASSERT_THROW(tp.add([]() { }), std::runtime_error);
+    ASSERT_THROW(tp.add([]() {}), std::runtime_error);
 }
