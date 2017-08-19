@@ -25,26 +25,55 @@ namespace bureaucracy
     class Timer
     {
     public:
+        /// \brief An Item added to a Timer.
         class Item
         {
+            friend class Timer;
+
         public:
+            /// \brief An Identifier for an Item.
             using Id = std::uint64_t;
 
+            /// \brief Current status of an Item.
             enum class Status
             {
-                QUEUED,
-                FIRING,
-                FIRED
+                QUEUED,  ///< the Item is queued
+                FIRING,  ///< the Item is firing or about to be fired
+                COMPLETE ///< the Item has been fired or cancelled
             };
 
+            /// \brief Result of a call to cancel.
             enum class CancelStatus
             {
-                CANCELLED,
-                FAILED
+                CANCELLED, ///< the Item was cancelled
+                FAILED     ///< the cancel operation failed
             };
 
+            /** \brief Construct an Item.
+             *
+             * \internal
+             *
+             * \param [in] timer
+             *      the Timer associated with this Item
+             *
+             * \param [in] id
+             *      the Id of this Item
+             */
             Item(Timer * const timer, Id id);
 
+            /** \brief Cancel an Item if possible.
+             *
+             * This can fail if:
+             *   * this Item is current firing
+             *   * this Item is queued to fire (i.e., its delay has expired and
+             *     has already been flagged for processing)
+             *
+             * \retval CancelStatus::CANCELLED
+             *      This Item was cancelled successfully.
+             *
+             * \retval CancelStatus::FAILED
+             *      This Item was not cancelled.
+             */
             CancelStatus cancel();
 
         private:
@@ -63,12 +92,10 @@ namespace bureaucracy
          */
         using Event = std::function<void() noexcept>;
 
-        /** \brief A point in time when an Event can be invoked.
-         */
+        /// \brief A point in time when an Event can be invoked.
         using Time = std::chrono::time_point<std::chrono::steady_clock>;
 
-        /** \brief Construct a Timer
-         */
+        /// \brief Construct a Timer
         Timer();
 
         /** \brief Add an Event that fires at a specific time.
