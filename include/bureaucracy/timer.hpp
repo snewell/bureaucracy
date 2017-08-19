@@ -103,7 +103,7 @@ namespace bureaucracy
          *       the Timer executes Events.
          */
         template <typename CLOCK>
-        void add(Event event, std::chrono::time_point<CLOCK> due);
+        Item add(Event event, std::chrono::time_point<CLOCK> due);
 
         /** \brief Add an Event that fires after a delay.
          *
@@ -120,7 +120,7 @@ namespace bureaucracy
          *       the Timer executes Events.
          */
         template <typename... ARGS>
-        void add(Event event, std::chrono::duration<ARGS...> delay);
+        Item add(Event event, std::chrono::duration<ARGS...> delay);
 
         /** \brief Stop accepting Events and terminate the Timer thread
          *
@@ -192,16 +192,16 @@ namespace bureaucracy
     };
 
     template <typename CLOCK>
-    inline void Timer::add(Event event, std::chrono::time_point<CLOCK> due)
+    inline Timer::Item Timer::add(Event event, std::chrono::time_point<CLOCK> due)
     {
         auto const delay = due - CLOCK::now();
-        add(std::move(event), delay);
+        return add(std::move(event), delay);
     }
 
     template <typename... ARGS>
-    inline void Timer::add(Event event, std::chrono::duration<ARGS...> delay)
+    inline Timer::Item Timer::add(Event event, std::chrono::duration<ARGS...> delay)
     {
-        add(std::move(event), std::chrono::steady_clock::now() + delay);
+        return add(std::move(event), std::chrono::steady_clock::now() + delay);
     }
 
     auto Timer::Item::cancel() -> CancelStatus

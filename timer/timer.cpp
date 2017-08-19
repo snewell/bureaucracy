@@ -109,6 +109,7 @@ Timer::Item Timer::add(Event event, Time due)
             });
             my_futureEvents.emplace(it, FutureEvent{id, due});
             my_events.emplace(id, std::move(event));
+            my_nextFuture = std::begin(my_futureEvents);
             my_wakeup.notify_one();
         }
         return Item{this, id};
@@ -163,7 +164,8 @@ Timer::Item::CancelStatus Timer::cancel(Timer::Item::Id id)
         if(pendingIt != pendingEnd)
         {
             my_pendingEvents.erase(pendingIt);
-            return Timer::Item::CancelStatus::CANCELLED;         }
+            return Timer::Item::CancelStatus::CANCELLED;
+        }
     }
 
     // We need to the check the future events whether we're firing or not.
