@@ -27,9 +27,7 @@ TEST(Timer, test_addPostStop)
     Timer t;
 
     t.stop();
-    auto addFn = [&t]() {
-        t.add([]() { }, std::chrono::milliseconds(0));
-    };
+    auto addFn = [&t]() { t.add([]() {}, std::chrono::milliseconds(0)); };
     ASSERT_THROW(addFn(), std::runtime_error);
 }
 
@@ -204,7 +202,7 @@ TEST(Timer, test_cancelNormal)
 {
     Timer t;
 
-    auto item = t.add([]() { }, std::chrono::milliseconds(100));
+    auto item = t.add([]() {}, std::chrono::milliseconds(100));
     ASSERT_EQ(Timer::Item::CancelStatus::CANCELLED, item.cancel());
 }
 
@@ -213,9 +211,8 @@ TEST(Timer, test_cancelFailed)
     Timer t;
 
     std::promise<void> hit;
-    auto item = t.add([&hit]() {
-        hit.set_value();
-    }, std::chrono::milliseconds(100));
+    auto item =
+        t.add([&hit]() { hit.set_value(); }, std::chrono::milliseconds(100));
 
     hit.get_future().get();
     ASSERT_EQ(Timer::Item::CancelStatus::FAILED, item.cancel());
@@ -225,14 +222,16 @@ TEST(Timer, test_cancelFiring)
 {
     Timer t;
 
-    auto item = t.add([]() { }, std::chrono::seconds(100));
+    auto item = t.add([]() {}, std::chrono::seconds(100));
 
     auto cancelStatus = Timer::Item::CancelStatus::FAILED;
     std::promise<void> hit;
-    t.add([&hit, &item, &cancelStatus]() {
-        cancelStatus = item.cancel();
-        hit.set_value();
-    }, std::chrono::milliseconds(100));
+    t.add(
+        [&hit, &item, &cancelStatus]() {
+            cancelStatus = item.cancel();
+            hit.set_value();
+        },
+        std::chrono::milliseconds(100));
 
     hit.get_future().get();
     ASSERT_EQ(Timer::Item::CancelStatus::CANCELLED, cancelStatus);
@@ -244,11 +243,13 @@ TEST(Timer, test_cancelPending)
 
     auto cancelStatus = Timer::Item::CancelStatus::FAILED;
     std::promise<void> hit;
-    t.add([&hit, &t, &cancelStatus]() {
-        auto item = t.add([]() { }, std::chrono::seconds(100));
-        cancelStatus = item.cancel();
-        hit.set_value();
-    }, std::chrono::milliseconds(100));
+    t.add(
+        [&hit, &t, &cancelStatus]() {
+            auto item = t.add([]() {}, std::chrono::seconds(100));
+            cancelStatus = item.cancel();
+            hit.set_value();
+        },
+        std::chrono::milliseconds(100));
 
     hit.get_future().get();
     ASSERT_EQ(Timer::Item::CancelStatus::CANCELLED, cancelStatus);

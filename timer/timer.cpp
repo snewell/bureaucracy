@@ -46,15 +46,14 @@ Timer::Timer()
                     std::for_each(
                         std::begin(my_pendingEvents),
                         std::end(my_pendingEvents), [this](auto & event) {
-                            auto it =
-                                std::find_if(std::begin(my_futureEvents),
-                                             std::end(my_futureEvents),
-                                             [& event](auto const & futureEvent) {
-                                return event.due < futureEvent.due;
-                            });
-                            my_futureEvents.emplace(it,
-                                                    FutureEvent{event.event,
-                                                                event.due});
+                            auto it = std::find_if(
+                                std::begin(my_futureEvents),
+                                std::end(my_futureEvents),
+                                [&event](auto const & futureEvent) {
+                                    return event.due < futureEvent.due;
+                                });
+                            my_futureEvents.emplace(
+                                it, FutureEvent{event.event, event.due});
                             my_events.emplace(event.event, std::move(event.fn));
                         });
                     my_pendingEvents.erase(std::begin(my_pendingEvents),
@@ -97,16 +96,16 @@ Timer::Item Timer::add(Event event, Time due)
 
         if(my_isFiring)
         {
-            my_pendingEvents.emplace_back(PendingEvent{id, due,
-                                                       std::move(event)});
+            my_pendingEvents.emplace_back(
+                PendingEvent{id, due, std::move(event)});
         }
         else
         {
             auto it = std::find_if(std::begin(my_futureEvents),
                                    std::end(my_futureEvents),
                                    [due](auto const & currentEvent) {
-                return due < currentEvent.due;
-            });
+                                       return due < currentEvent.due;
+                                   });
             my_futureEvents.emplace(it, FutureEvent{id, due});
             my_events.emplace(id, std::move(event));
             my_nextFuture = std::begin(my_futureEvents);
@@ -156,11 +155,11 @@ Timer::Item::CancelStatus Timer::cancel(Timer::Item::Id id)
     if(my_isFiring)
     {
         auto const pendingEnd = std::end(my_pendingEvents);
-        auto const pendingIt = std::find_if(std::begin(my_pendingEvents),
-                                            pendingEnd,
-                                            [id](auto const & pendingEvent) {
-            return pendingEvent.event == id;
-        });
+        auto const pendingIt =
+            std::find_if(std::begin(my_pendingEvents), pendingEnd,
+                         [id](auto const & pendingEvent) {
+                             return pendingEvent.event == id;
+                         });
         if(pendingIt != pendingEnd)
         {
             my_pendingEvents.erase(pendingIt);
@@ -170,10 +169,10 @@ Timer::Item::CancelStatus Timer::cancel(Timer::Item::Id id)
 
     // We need to the check the future events whether we're firing or not.
     auto const end = std::end(my_futureEvents);
-    auto futureIt = std::find_if(my_nextFuture, end,
-                                 [id](auto const & futureEvent) {
-        return futureEvent.event == id;
-    });
+    auto futureIt =
+        std::find_if(my_nextFuture, end, [id](auto const & futureEvent) {
+            return futureEvent.event == id;
+        });
     if(futureIt != end)
     {
         my_futureEvents.erase(futureIt);
@@ -188,4 +187,6 @@ Timer::Item::CancelStatus Timer::cancel(Timer::Item::Id id)
 
 Timer::Timer::Item::Item(Timer * const timer, Id id)
   : my_timer{timer}
-  , my_id{id} {}
+  , my_id{id}
+{
+}

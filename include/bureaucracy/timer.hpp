@@ -192,14 +192,16 @@ namespace bureaucracy
     };
 
     template <typename CLOCK>
-    inline Timer::Item Timer::add(Event event, std::chrono::time_point<CLOCK> due)
+    inline Timer::Item Timer::add(Event event,
+                                  std::chrono::time_point<CLOCK> due)
     {
         auto const delay = due - CLOCK::now();
         return add(std::move(event), delay);
     }
 
     template <typename... ARGS>
-    inline Timer::Item Timer::add(Event event, std::chrono::duration<ARGS...> delay)
+    inline Timer::Item Timer::add(Event event,
+                                  std::chrono::duration<ARGS...> delay)
     {
         return add(std::move(event), std::chrono::steady_clock::now() + delay);
     }
@@ -211,4 +213,3 @@ namespace bureaucracy
 }
 
 #endif
-
