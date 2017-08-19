@@ -5,6 +5,7 @@
 #include <functional>
 #include <mutex>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 namespace bureaucracy
@@ -24,6 +25,35 @@ namespace bureaucracy
     class Timer
     {
     public:
+        class Item
+        {
+        public:
+            using Id = std::uint64_t;
+
+            enum class Status
+            {
+                QUEUED,
+                FIRING,
+                FIRED
+            };
+
+            enum class CancelStatus
+            {
+                CANCELLED,
+                FAILED
+            };
+
+            Item(Timer * const timer, Id id);
+
+            CancelStatus cancel();
+
+        private:
+            Timer * const my_timer;
+            Id const my_id;
+        };
+
+        friend class Item;
+
         /** \brief A function a Timer can invoke.
          *
          * \warning An Event should ideally be a very minimal function that
@@ -55,7 +85,7 @@ namespace bureaucracy
          * \note If \p due is in the past \p event will be fired the next time
          *       the Timer executes Events.
          */
-        void add(Event event, Time due);
+        Item add(Event event, Time due);
 
         /** \brief Add an Event that fires at a specific time.
          *
@@ -130,18 +160,35 @@ namespace bureaucracy
         mutable std::mutex my_mutex;
         std::condition_variable my_wakeup;
 
-        struct TimerEvent
+        std::unordered_map<Item::Id, Event> my_events;
+
+        struct FutureEvent
         {
-            Event event;
+            Item::Id event;
             Time due;
         };
 
-        std::vector<TimerEvent> my_futureEvents;
-        std::vector<TimerEvent> my_pendingEvents;
+        using FutureEvents = std::vector<FutureEvent>;
+        FutureEvents my_futureEvents;
+
+        struct PendingEvent
+        {
+            Item::Id event;
+            Time due;
+            Event fn;
+        };
+
+        std::vector<PendingEvent> my_pendingEvents;
+
+        FutureEvents::iterator my_nextFuture;
+
+        Item::Id my_nextId;
 
         bool my_isAccepting;
         bool my_isRunning;
         bool my_isFiring;
+
+        Item::CancelStatus cancel(Timer::Item::Id id);
     };
 
     template <typename CLOCK>
@@ -156,6 +203,12 @@ namespace bureaucracy
     {
         add(std::move(event), std::chrono::steady_clock::now() + delay);
     }
+
+    auto Timer::Item::cancel() -> CancelStatus
+    {
+        return my_timer->cancel(my_id);
+    }
 }
 
 #endif
+

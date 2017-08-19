@@ -22,6 +22,17 @@ TEST(Timer, test_stop)
     ASSERT_EQ(false, t.isRunning());
 }
 
+TEST(Timer, test_addPostStop)
+{
+    Timer t;
+
+    t.stop();
+    auto addFn = [&t]() {
+        t.add([]() { }, std::chrono::milliseconds(0));
+    };
+    ASSERT_THROW(addFn(), std::runtime_error);
+}
+
 TEST(Timer, test_addDue)
 {
     Timer t;
