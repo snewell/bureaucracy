@@ -8,6 +8,8 @@ project("bureaucracy"
 include(GNUInstallDirs)
 include(CTest)
 
+find_package(PkgConfig)
+
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
@@ -96,13 +98,13 @@ endif()
 set(runtimeComponent "Runtime")
 set(devComponent "Development")
 
+
 install(TARGETS
             bureaucracy
             bureaucracy-static
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${devComponent}
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${runtimeComponent}
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${runtimeComponent}
-
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${devComponent}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${runtimeComponent}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${runtimeComponent}
        )
 
 install(FILES
@@ -118,3 +120,23 @@ install(FILES
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/bureaucracy
         COMPONENT ${devComponent}
        )
+
+if(PKG_CONFIG_FOUND)
+    set(pcFile
+        "${CMAKE_CURRENT_BINARY_DIR}/bureaucracy-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.pc")
+    configure_file(pkg-config.pc.in ${pcFile} @ONLY)
+    set(CMAKE_INSTALL_PKGCONFIGDIR "${CMAKE_INSTALL_DATADIR}/pkgconfig")
+    install(FILES
+                ${pcFile}
+            DESTINATION ${CMAKE_INSTALL_PKGCONFIGDIR}
+            COMPONENT ${devComponent}
+           )
+endif()
+
+if(DOXYGEN)
+    install(DIRECTORY
+                "${CMAKE_CURRENT_BINARY_DIR}/doc/html"
+            DESTINATION ${CMAKE_INSTALL_DOCDIR}
+            COMPONENT ${devComponent}
+           )
+endif()

@@ -1,0 +1,13 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+sharedlibdir=${libdir}
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: bureaucracy
+Description: bureaucracy work library
+Version: @PROJECT_VERSION@
+
+Requires:
+Libs: @CMAKE_LIBRARY_PATH_FLAG@${sharedlibdir} @CMAKE_LINK_LIBRARY_FLAG@bureaucracy
+Cflags: -I${includedir}
