@@ -140,3 +140,7 @@ if(DOXYGEN)
             COMPONENT ${devComponent}
            )
 endif()
+install(FILES
+            COPYING
+        DESTINATION ${CMAKE_INSTALL_DOCDIR}
+       )
