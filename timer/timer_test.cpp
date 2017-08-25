@@ -203,7 +203,7 @@ TEST(Timer, test_cancelNormal)
     Timer t;
 
     auto item = t.add([]() {}, std::chrono::milliseconds(100));
-    ASSERT_EQ(Timer::Item::CancelStatus::CANCELLED, item.cancel());
+    ASSERT_EQ(Timer::Item::CancelStatus::cancelled, t.cancel(item));
 }
 
 TEST(Timer, test_cancelFailed)
@@ -215,7 +215,7 @@ TEST(Timer, test_cancelFailed)
         t.add([&hit]() { hit.set_value(); }, std::chrono::milliseconds(100));
 
     hit.get_future().get();
-    ASSERT_EQ(Timer::Item::CancelStatus::FAILED, item.cancel());
+    ASSERT_EQ(Timer::Item::CancelStatus::failed, t.cancel(item));
 }
 
 TEST(Timer, test_cancelFiring)
@@ -224,33 +224,33 @@ TEST(Timer, test_cancelFiring)
 
     auto item = t.add([]() {}, std::chrono::seconds(100));
 
-    auto cancelStatus = Timer::Item::CancelStatus::FAILED;
+    auto cancelStatus = Timer::Item::CancelStatus::failed;
     std::promise<void> hit;
     t.add(
-        [&hit, &item, &cancelStatus]() {
-            cancelStatus = item.cancel();
+        [&hit, &t, item, &cancelStatus]() {
+            cancelStatus = t.cancel(item);
             hit.set_value();
         },
         std::chrono::milliseconds(100));
 
     hit.get_future().get();
-    ASSERT_EQ(Timer::Item::CancelStatus::CANCELLED, cancelStatus);
+    ASSERT_EQ(Timer::Item::CancelStatus::cancelled, cancelStatus);
 }
 
 TEST(Timer, test_cancelPending)
 {
     Timer t;
 
-    auto cancelStatus = Timer::Item::CancelStatus::FAILED;
+    auto cancelStatus = Timer::Item::CancelStatus::failed;
     std::promise<void> hit;
     t.add(
         [&hit, &t, &cancelStatus]() {
             auto item = t.add([]() {}, std::chrono::seconds(100));
-            cancelStatus = item.cancel();
+            cancelStatus = t.cancel(item);
             hit.set_value();
         },
         std::chrono::milliseconds(100));
 
     hit.get_future().get();
-    ASSERT_EQ(Timer::Item::CancelStatus::CANCELLED, cancelStatus);
+    ASSERT_EQ(Timer::Item::CancelStatus::cancelled, cancelStatus);
 }

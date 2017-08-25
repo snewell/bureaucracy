@@ -146,7 +146,7 @@ bool Timer::isRunning() const noexcept
     return my_isRunning;
 }
 
-Timer::Item::CancelStatus Timer::cancel(Timer::Item::Id id)
+Timer::Item::CancelStatus Timer::cancel(Timer::Item item)
 {
     std::lock_guard<std::mutex> lock{my_mutex};
 
@@ -155,34 +155,34 @@ Timer::Item::CancelStatus Timer::cancel(Timer::Item::Id id)
     if(my_isFiring)
     {
         auto const pendingEnd = std::end(my_pendingEvents);
-        auto const pendingIt =
-            std::find_if(std::begin(my_pendingEvents), pendingEnd,
-                         [id](auto const & pendingEvent) {
-                             return pendingEvent.event == id;
-                         });
+        auto const pendingIt = std::find_if(
+            std::begin(my_pendingEvents),
+            pendingEnd, [id = item.my_id](auto const & pendingEvent) {
+                return pendingEvent.event == id;
+            });
         if(pendingIt != pendingEnd)
         {
             my_pendingEvents.erase(pendingIt);
-            return Timer::Item::CancelStatus::CANCELLED;
+            return Timer::Item::CancelStatus::cancelled;
         }
     }
 
     // We need to the check the future events whether we're firing or not.
     auto const end = std::end(my_futureEvents);
-    auto futureIt =
-        std::find_if(my_nextFuture, end, [id](auto const & futureEvent) {
+    auto futureIt = std::find_if(
+        my_nextFuture, end, [id = item.my_id](auto const & futureEvent) {
             return futureEvent.event == id;
         });
     if(futureIt != end)
     {
         my_futureEvents.erase(futureIt);
-        my_events.erase(id);
-        return Timer::Item::CancelStatus::CANCELLED;
+        my_events.erase(item.my_id);
+        return Timer::Item::CancelStatus::cancelled;
     }
 
     // At this point, we didn't find the item in either queue.  It's either an
     // invalid id or queued to fire.
-    return Timer::Item::CancelStatus::FAILED;
+    return Timer::Item::CancelStatus::failed;
 }
 
 Timer::Timer::Item::Item(Timer * const timer, Id id)

@@ -37,16 +37,16 @@ namespace bureaucracy
             /// \brief Current status of an Item.
             enum class Status
             {
-                QUEUED,  ///< the Item is queued
-                FIRING,  ///< the Item is firing or about to be fired
-                COMPLETE ///< the Item has been fired or cancelled
+                queued,  ///< the Item is queued
+                firing,  ///< the Item is firing or about to be fired
+                complete ///< the Item has been fired or cancelled
             };
 
             /// \brief Result of a call to cancel.
             enum class CancelStatus
             {
-                CANCELLED, ///< the Item was cancelled
-                FAILED     ///< the cancel operation failed
+                cancelled, ///< the Item was cancelled
+                failed     ///< the cancel operation failed
             };
 
             /** \brief Construct an Item.
@@ -61,27 +61,10 @@ namespace bureaucracy
              */
             Item(Timer * const timer, Id id);
 
-            /** \brief Cancel an Item if possible.
-             *
-             * This can fail if:
-             *   * this Item is current firing
-             *   * this Item is queued to fire (i.e., its delay has expired and
-             *     has already been flagged for processing)
-             *
-             * \retval CancelStatus::CANCELLED
-             *      This Item was cancelled successfully.
-             *
-             * \retval CancelStatus::FAILED
-             *      This Item was not cancelled.
-             */
-            CancelStatus cancel();
-
         private:
             Timer * const my_timer;
             Id const my_id;
         };
-
-        friend class Item;
 
         /** \brief A function a Timer can invoke.
          *
@@ -174,6 +157,21 @@ namespace bureaucracy
          */
         bool isRunning() const noexcept;
 
+        /** \brief Cancel an Item if possible.
+         *
+         * This can fail if:
+         *   * this Item is current firing
+         *   * this Item is queued to fire (i.e., its delay has expired and
+         *     has already been flagged for processing)
+         *
+         * \retval CancelStatus::cancelled
+         *      This Item was cancelled successfully.
+         *
+         * \retval CancelStatus::failed
+         *      This Item was not cancelled.
+         */
+        Item::CancelStatus cancel(Timer::Item item);
+
         /// \cond false
         ~Timer() noexcept;
         Timer(Timer const &) = delete;
@@ -214,8 +212,6 @@ namespace bureaucracy
         bool my_isAccepting;
         bool my_isRunning;
         bool my_isFiring;
-
-        Item::CancelStatus cancel(Timer::Item::Id id);
     };
 
     template <typename CLOCK>
@@ -231,11 +227,6 @@ namespace bureaucracy
                                   std::chrono::duration<ARGS...> delay)
     {
         return add(std::move(event), std::chrono::steady_clock::now() + delay);
-    }
-
-    auto Timer::Item::cancel() -> CancelStatus
-    {
-        return my_timer->cancel(my_id);
     }
 }
 
