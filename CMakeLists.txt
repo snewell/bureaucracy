@@ -8,6 +8,7 @@ project("bureaucracy"
 include(GNUInstallDirs)
 include(CTest)
 
+find_package(GTest)
 find_package(PkgConfig)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
@@ -27,11 +28,7 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(include)
 
 if(BUILD_TESTS)
-    find_library(GTEST gtest)
-    find_library(GTEST_MAIN gtest_main)
-    message(STATUS "gtest location: ${GTEST}")
-    message(STATUS "gtest_main location: ${GTEST_MAIN}")
-    if(NOT GTEST OR NOT GTEST_MAIN)
+    if(NOT GTEST_FOUND)
         message(WARNING "Could not find gtest libraries; unit tests disabled")
         set(BUILD_TESTS OFF)
     endif()
@@ -41,8 +38,8 @@ if(BUILD_TESTS)
     function(create_test name)
         add_executable(${name} ${ARGN})
         target_link_libraries(${name}
-                                ${GTEST}
-                                ${GTEST_MAIN}
+                                GTest::GTest
+                                GTest::Main
                                 bureaucracy
                              )
         add_test(${name} ${name} "--gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${name}_results.xml")
