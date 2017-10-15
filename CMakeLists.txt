@@ -10,6 +10,7 @@ include(CTest)
 
 find_package(GTest)
 find_package(PkgConfig)
+find_package(Threads REQUIRED)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
@@ -21,11 +22,6 @@ option(BUILD_TESTS "Build optional tests" ON)
 option(BUILD_DOCS  "Build documenttaion" ON)
 
 enable_testing()
-
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 14)
-
-include_directories(include)
 
 if(BUILD_TESTS)
     if(NOT GTEST_FOUND)
@@ -41,6 +37,10 @@ if(BUILD_TESTS)
                                 GTest::GTest
                                 GTest::Main
                                 bureaucracy
+                             )
+        set_target_properties(${name} PROPERTIES
+                                CXX_STANDARD 14
+                                CXX_EXTENSIONS OFF
                              )
         add_test(${name} ${name} "--gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${name}_results.xml")
     endfunction()
@@ -63,10 +63,28 @@ set_target_properties(bureaucracy PROPERTIES
                         VERSION ${PROJECT_VERSION}
                         SOVERSION ${PROJECT_VERSION_MAJOR}
                      )
+target_include_directories(bureaucracy PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+                          )
+target_link_libraries(bureaucracy
+                        PUBLIC Threads::Threads
+                     )
 
 add_library(bureaucracy-static STATIC ${bureaucracy_srcs})
 set_target_properties(bureaucracy-static PROPERTIES
                         OUTPUT_NAME bureaucracy
+                     )
+target_include_directories(bureaucracy-static PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+                          )
+set_target_properties(
+                bureaucracy
+                bureaucracy-static
+                PROPERTIES
+                    CXX_STANDARD 14
+                    CXX_EXTENSIONS OFF
                      )
 
 if(BUILD_DOCS)
@@ -95,10 +113,10 @@ endif()
 set(runtimeComponent "Runtime")
 set(devComponent "Development")
 
-
 install(TARGETS
             bureaucracy
             bureaucracy-static
+        EXPORT BureaucracyConfig
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${devComponent}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${runtimeComponent}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${runtimeComponent}
@@ -116,6 +134,18 @@ install(FILES
             include/bureaucracy/workercommon.hpp
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/bureaucracy
         COMPONENT ${devComponent}
+       )
+
+export(TARGETS
+            bureaucracy
+            bureaucracy-static
+        NAMESPACE Bureaucracy::
+        FILE "${CMAKE_CURRENT_BINARY_DIR}/BureaucracyConfig.cmake"
+      )
+install(EXPORT
+            BureaucracyConfig
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/Bureaucracy/cmake"
+        NAMESPACE Bureaucracy::
        )
 
 if(PKG_CONFIG_FOUND)
