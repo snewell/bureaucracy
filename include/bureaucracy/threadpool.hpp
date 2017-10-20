@@ -26,7 +26,7 @@ namespace bureaucracy
          * \exception std::exception
          *      an exception was emitted from the standard library
          */
-        Threadpool(std::size_t threads);
+        explicit Threadpool(std::size_t threads);
 
         /** \brief Add Work to the end of the queue
          *

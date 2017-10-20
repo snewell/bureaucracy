@@ -20,7 +20,7 @@ namespace bureaucracy
     class WorkerCommon
     {
     public:
-        WorkerCommon(Worker & worker);
+        explicit WorkerCommon(Worker & worker);
 
         template <typename ADDFN>
         void add(ADDFN const & addFn);

@@ -24,7 +24,7 @@ namespace bureaucracy
          * \param [in] worker
          *      the Worker to feed Work to
          */
-        SerialWorker(Worker & worker);
+        explicit SerialWorker(Worker & worker);
 
         void add(Work work) override;
 

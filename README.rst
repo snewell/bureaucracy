@@ -1,5 +1,7 @@
 bureaucracy
 ===========
+|codacy|
+
 bureaucracy is a simple library to distribute work among threads; at its
 heart, bureaucracy is a threadpool with a bit of extra functionality.
 
@@ -30,3 +32,7 @@ overwritten at configuration time (step 3 in the previous section).
 
 .. _CMake: https://cmake.org/
 .. _gtest: https://github.com/google/googletest
+
+.. |codacy| image::
+    https://api.codacy.com/project/badge/Grade/734e74a8f0c542c584e72721f22c81ca
+    :target: https://www.codacy.com/app/snewell/bureaucracy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=snewell/bureaucracy&amp;utm_campaign=Badge_Grade

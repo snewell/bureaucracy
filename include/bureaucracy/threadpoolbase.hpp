@@ -21,7 +21,7 @@ namespace bureaucracy
     class ThreadpoolBase
     {
     public:
-        ThreadpoolBase(std::size_t maxThreads);
+        explicit ThreadpoolBase(std::size_t maxThreads);
 
         void add(Worker::Work work);
 
