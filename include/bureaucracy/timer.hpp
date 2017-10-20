@@ -73,7 +73,7 @@ namespace bureaucracy
          *          an Event requires complex work consider using the Event to
          *          feed work into a Worker.
          */
-        using Event = std::function<void() noexcept>;
+        using Event = std::function<void()>;
 
         /// \brief A point in time when an Event can be invoked.
         using Time = std::chrono::time_point<std::chrono::steady_clock>;

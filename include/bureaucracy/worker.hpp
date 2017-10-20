@@ -12,7 +12,7 @@ namespace bureaucracy
     public:
         /** \brief a piece of work to performed
          */
-        using Work = std::function<void() noexcept>;
+        using Work = std::function<void()>;
 
         /** \brief Queue Work for execution.
          *
