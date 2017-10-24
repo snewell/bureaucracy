@@ -6,7 +6,7 @@
 
 using bureaucracy::ExpandingThreadpool;
 
-TEST(ExpandingThreadpool, test_ctor)
+TEST(ExpandingThreadpool, test_ctor) // NOLINT
 {
     ExpandingThreadpool tp{4, 4};
 
@@ -16,7 +16,7 @@ TEST(ExpandingThreadpool, test_ctor)
     ASSERT_EQ(4, tp.maxThreads());
 }
 
-TEST(ExpandingThreadpool, test_stop)
+TEST(ExpandingThreadpool, test_stop) // NOLINT
 {
     ExpandingThreadpool tp{4, 4};
 
@@ -25,7 +25,7 @@ TEST(ExpandingThreadpool, test_stop)
     ASSERT_EQ(false, tp.isRunning());
 }
 
-TEST(ExpandingThreadpool, test_work)
+TEST(ExpandingThreadpool, test_work) // NOLINT
 {
     ExpandingThreadpool tp{4, 4};
 
@@ -37,7 +37,7 @@ TEST(ExpandingThreadpool, test_work)
     ASSERT_EQ(10, result.get());
 }
 
-TEST(ExpandingThreadpool, test_expand)
+TEST(ExpandingThreadpool, test_expand) // NOLINT
 {
     ExpandingThreadpool tp{2, 2};
 
@@ -60,7 +60,7 @@ TEST(ExpandingThreadpool, test_expand)
     tp.stop();
 }
 
-TEST(ExpandingThreadpool, test_expandFail)
+TEST(ExpandingThreadpool, test_expandFail) // NOLINT
 {
     ExpandingThreadpool tp{1, 2};
 
@@ -83,7 +83,7 @@ TEST(ExpandingThreadpool, test_expandFail)
     tp.stop();
 }
 
-TEST(NegativeExpandingThreadpool, test_invalidThreadCount)
+TEST(NegativeExpandingThreadpool, test_invalidThreadCount) // NOLINT
 {
     try
     {
@@ -100,7 +100,7 @@ TEST(NegativeExpandingThreadpool, test_invalidThreadCount)
     }
 }
 
-TEST(NegativeExpandingThreadpool, test_invalidBacklog)
+TEST(NegativeExpandingThreadpool, test_invalidBacklog) // NOLINT
 {
     try
     {
@@ -117,7 +117,7 @@ TEST(NegativeExpandingThreadpool, test_invalidBacklog)
     }
 }
 
-TEST(NegativeExpandingThreadpool, test_addStopped)
+TEST(NegativeExpandingThreadpool, test_addStopped) // NOLINT
 {
     ExpandingThreadpool tp{4, 4};
     tp.stop();

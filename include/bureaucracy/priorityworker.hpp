@@ -64,7 +64,7 @@ namespace bureaucracy
         bool isRunning() const noexcept override;
 
         /// \cond false
-        ~PriorityWorker() noexcept;
+        ~PriorityWorker() noexcept override;
         /// \endcond
 
     private:

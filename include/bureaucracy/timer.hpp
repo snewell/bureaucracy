@@ -59,7 +59,7 @@ namespace bureaucracy
              * \param [in] id
              *      the Id of this Item
              */
-            Item(Timer * const timer, Id id);
+            Item(Timer * timer, Id id);
 
         private:
             Timer * const my_timer;

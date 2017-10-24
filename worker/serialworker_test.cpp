@@ -8,7 +8,7 @@
 using bureaucracy::SerialWorker;
 using bureaucracy::Threadpool;
 
-TEST(SerialWorker, test_ctor)
+TEST(SerialWorker, test_ctor) // NOLINT
 {
     Threadpool tp{4};
     SerialWorker sw{tp};
@@ -17,7 +17,7 @@ TEST(SerialWorker, test_ctor)
     ASSERT_EQ(true, sw.isRunning());
 }
 
-TEST(SerialWorker, test_stop)
+TEST(SerialWorker, test_stop) // NOLINT
 {
     Threadpool tp{4};
     SerialWorker sw{tp};
@@ -38,7 +38,7 @@ namespace
     }
 }
 
-TEST(SerialWorker, test_workOrder)
+TEST(SerialWorker, test_workOrder) // NOLINT
 {
     Threadpool tp{4};
     SerialWorker sw{tp};
@@ -59,7 +59,7 @@ TEST(SerialWorker, test_workOrder)
     hit.get_future().get();
 }
 
-TEST(SerialWorker, test_sequencing)
+TEST(SerialWorker, test_sequencing) // NOLINT
 {
     Threadpool tp{4};
     SerialWorker sw{tp};
@@ -80,7 +80,7 @@ TEST(SerialWorker, test_sequencing)
     future.get();
 }
 
-TEST(NegativeSerialWorker, test_addStopped)
+TEST(NegativeSerialWorker, test_addStopped) // NOLINT
 {
     Threadpool tp{4};
     SerialWorker sw{tp};

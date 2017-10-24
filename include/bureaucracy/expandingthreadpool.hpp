@@ -78,7 +78,7 @@ namespace bureaucracy
         std::size_t spawnedThreads() const noexcept;
 
         /// \cond false
-        ~ExpandingThreadpool() noexcept;
+        ~ExpandingThreadpool() noexcept override;
         ExpandingThreadpool(ExpandingThreadpool const &) = delete;
         ExpandingThreadpool(ExpandingThreadpool &&) noexcept = delete;
         ExpandingThreadpool & operator=(ExpandingThreadpool const &) = delete;

@@ -48,7 +48,7 @@ namespace bureaucracy
         bool isRunning() const noexcept override;
 
         /// \cond false
-        ~DiligentWorker() noexcept;
+        ~DiligentWorker() noexcept override;
         /// \endcond
 
     private:

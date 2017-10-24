@@ -48,7 +48,7 @@ namespace bureaucracy
         bool isRunning() const noexcept override;
 
         /// \cond false
-        ~Threadpool() noexcept;
+        ~Threadpool() noexcept override;
 
         Threadpool(const Threadpool &) = delete;
         Threadpool(Threadpool &&) = delete;

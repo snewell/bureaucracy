@@ -6,14 +6,14 @@
 
 using bureaucracy::Timer;
 
-TEST(Timer, test_ctor)
+TEST(Timer, test_ctor) // NOLINT
 {
     Timer t;
     ASSERT_EQ(true, t.isAccepting());
     ASSERT_EQ(true, t.isRunning());
 }
 
-TEST(Timer, test_stop)
+TEST(Timer, test_stop) // NOLINT
 {
     Timer t;
 
@@ -22,7 +22,7 @@ TEST(Timer, test_stop)
     ASSERT_EQ(false, t.isRunning());
 }
 
-TEST(Timer, test_addPostStop)
+TEST(Timer, test_addPostStop) // NOLINT
 {
     Timer t;
 
@@ -31,7 +31,7 @@ TEST(Timer, test_addPostStop)
     ASSERT_THROW(addFn(), std::runtime_error);
 }
 
-TEST(Timer, test_addDue)
+TEST(Timer, test_addDue) // NOLINT
 {
     Timer t;
 
@@ -42,7 +42,7 @@ TEST(Timer, test_addDue)
     hit.get_future().get();
 }
 
-TEST(Timer, test_addDueSystem)
+TEST(Timer, test_addDueSystem) // NOLINT
 {
     Timer t;
 
@@ -53,7 +53,7 @@ TEST(Timer, test_addDueSystem)
     hit.get_future().get();
 }
 
-TEST(Timer, test_addDueHighResolution)
+TEST(Timer, test_addDueHighResolution) // NOLINT
 {
     Timer t;
 
@@ -65,7 +65,7 @@ TEST(Timer, test_addDueHighResolution)
     hit.get_future().get();
 }
 
-TEST(Timer, test_addDelay)
+TEST(Timer, test_addDelay) // NOLINT
 {
     Timer t;
 
@@ -75,7 +75,7 @@ TEST(Timer, test_addDelay)
     hit.get_future().get();
 }
 
-TEST(Timer, test_addSequence)
+TEST(Timer, test_addSequence) // NOLINT
 {
     Timer t;
 
@@ -100,7 +100,7 @@ TEST(Timer, test_addSequence)
     ASSERT_EQ(100, val);
 }
 
-TEST(Timer, test_addReverse)
+TEST(Timer, test_addReverse) // NOLINT
 {
     Timer t;
 
@@ -125,7 +125,7 @@ TEST(Timer, test_addReverse)
     ASSERT_EQ(100, val);
 }
 
-TEST(Timer, test_addFiring)
+TEST(Timer, test_addFiring) // NOLINT
 {
     Timer t;
 
@@ -140,7 +140,7 @@ TEST(Timer, test_addFiring)
     hit.get_future().get();
 }
 
-TEST(Timer, test_addFiringSequence)
+TEST(Timer, test_addFiringSequence) // NOLINT
 {
     Timer t;
 
@@ -169,7 +169,7 @@ TEST(Timer, test_addFiringSequence)
     ASSERT_EQ(100, val);
 }
 
-TEST(Timer, test_addFiringReverse)
+TEST(Timer, test_addFiringReverse) // NOLINT
 {
     Timer t;
 
@@ -198,7 +198,7 @@ TEST(Timer, test_addFiringReverse)
     ASSERT_EQ(100, val);
 }
 
-TEST(Timer, test_cancelNormal)
+TEST(Timer, test_cancelNormal) // NOLINT
 {
     Timer t;
 
@@ -206,7 +206,7 @@ TEST(Timer, test_cancelNormal)
     ASSERT_EQ(Timer::Item::CancelStatus::cancelled, t.cancel(item));
 }
 
-TEST(Timer, test_cancelFailed)
+TEST(Timer, test_cancelFailed) // NOLINT
 {
     Timer t;
 
@@ -218,7 +218,7 @@ TEST(Timer, test_cancelFailed)
     ASSERT_EQ(Timer::Item::CancelStatus::failed, t.cancel(item));
 }
 
-TEST(Timer, test_cancelFiring)
+TEST(Timer, test_cancelFiring) // NOLINT
 {
     Timer t;
 
@@ -237,7 +237,7 @@ TEST(Timer, test_cancelFiring)
     ASSERT_EQ(Timer::Item::CancelStatus::cancelled, cancelStatus);
 }
 
-TEST(Timer, test_cancelPending)
+TEST(Timer, test_cancelPending) // NOLINT
 {
     Timer t;
 

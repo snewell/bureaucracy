@@ -8,7 +8,7 @@
 using bureaucracy::PriorityWorker;
 using bureaucracy::Threadpool;
 
-TEST(PriorityWorker, test_ctor)
+TEST(PriorityWorker, test_ctor) // NOLINT
 {
     Threadpool tp{4};
     PriorityWorker pw{tp};
@@ -17,7 +17,7 @@ TEST(PriorityWorker, test_ctor)
     ASSERT_EQ(true, pw.isRunning());
 }
 
-TEST(PriorityWorker, test_stop)
+TEST(PriorityWorker, test_stop) // NOLINT
 {
     Threadpool tp{4};
     PriorityWorker pw{tp};
@@ -27,7 +27,7 @@ TEST(PriorityWorker, test_stop)
     ASSERT_EQ(false, pw.isRunning());
 }
 
-TEST(PriorityWorker, test_add)
+TEST(PriorityWorker, test_add) // NOLINT
 {
     Threadpool tp{4};
     PriorityWorker pw{tp};
@@ -38,7 +38,7 @@ TEST(PriorityWorker, test_add)
     ASSERT_EQ(true, hit);
 }
 
-TEST(PriorityWorker, test_distribute)
+TEST(PriorityWorker, test_distribute) // NOLINT
 {
     Threadpool tp{2};
     PriorityWorker pw{tp};
@@ -55,7 +55,7 @@ TEST(PriorityWorker, test_distribute)
     hit1.get_future().get();
 }
 
-TEST(PriorityWorker, test_addPriority)
+TEST(PriorityWorker, test_addPriority) // NOLINT
 {
     // we're going to use a Threadpool with one thread so we can control when
     // things fire
@@ -85,7 +85,7 @@ TEST(PriorityWorker, test_addPriority)
     ASSERT_EQ(10, value);
 }
 
-TEST(NegativePriorityWorker, test_addStopped)
+TEST(NegativePriorityWorker, test_addStopped) // NOLINT
 {
     Threadpool tp{4};
     PriorityWorker pw{tp};

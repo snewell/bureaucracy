@@ -8,7 +8,7 @@
 using bureaucracy::DiligentWorker;
 using bureaucracy::Threadpool;
 
-TEST(DiligentWorker, test_ctor)
+TEST(DiligentWorker, test_ctor) // NOLINT
 {
     Threadpool tp{4};
     DiligentWorker dw{tp, []() {}};
@@ -17,7 +17,7 @@ TEST(DiligentWorker, test_ctor)
     ASSERT_EQ(true, dw.isRunning());
 }
 
-TEST(DiligentWorker, test_stop)
+TEST(DiligentWorker, test_stop) // NOLINT
 {
     Threadpool tp{4};
     DiligentWorker dw{tp, []() {}};
@@ -27,7 +27,7 @@ TEST(DiligentWorker, test_stop)
     ASSERT_EQ(false, dw.isRunning());
 }
 
-TEST(DiligentWorker, test_add)
+TEST(DiligentWorker, test_add) // NOLINT
 {
     Threadpool tp{4};
     DiligentWorker dw{tp, []() {}};
@@ -37,7 +37,7 @@ TEST(DiligentWorker, test_add)
     hit.get_future().get();
 }
 
-TEST(DiligentWorker, test_alert)
+TEST(DiligentWorker, test_alert) // NOLINT
 {
     Threadpool tp{4};
 
@@ -56,7 +56,7 @@ TEST(DiligentWorker, test_alert)
     cond.wait(lock);
 }
 
-TEST(NegativeDiligentWorker, test_addStopped)
+TEST(NegativeDiligentWorker, test_addStopped) // NOLINT
 {
     Threadpool tp{4};
     DiligentWorker dw{tp, []() {}};

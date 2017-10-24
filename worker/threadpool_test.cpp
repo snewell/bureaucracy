@@ -6,7 +6,7 @@
 
 using bureaucracy::Threadpool;
 
-TEST(Threadpool, test_ctor)
+TEST(Threadpool, test_ctor) // NOLINT
 {
     Threadpool tp{4};
 
@@ -14,7 +14,7 @@ TEST(Threadpool, test_ctor)
     ASSERT_EQ(true, tp.isRunning());
 }
 
-TEST(Threadpool, test_stop)
+TEST(Threadpool, test_stop) // NOLINT
 {
     Threadpool tp{4};
 
@@ -23,7 +23,7 @@ TEST(Threadpool, test_stop)
     ASSERT_EQ(false, tp.isRunning());
 }
 
-TEST(Threadpool, test_work)
+TEST(Threadpool, test_work) // NOLINT
 {
     Threadpool tp{4};
 
@@ -35,12 +35,12 @@ TEST(Threadpool, test_work)
     ASSERT_EQ(10, result.get());
 }
 
-TEST(NegativeThreadpool, test_invalidThreadCount)
+TEST(NegativeThreadpool, test_invalidThreadCount) // NOLINT
 {
     ASSERT_THROW(Threadpool{0}, std::invalid_argument);
 }
 
-TEST(NegativeThreadpool, test_addStopped)
+TEST(NegativeThreadpool, test_addStopped) // NOLINT
 {
     Threadpool tp{4};
     tp.stop();

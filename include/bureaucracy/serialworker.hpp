@@ -35,7 +35,7 @@ namespace bureaucracy
         bool isRunning() const noexcept override;
 
         /// \cond false
-        ~SerialWorker() noexcept;
+        ~SerialWorker() noexcept override;
         /// \endcond
 
     private:
