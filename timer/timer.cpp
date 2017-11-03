@@ -113,10 +113,7 @@ Timer::Item Timer::add(Event event, Time due)
         }
         return Item{this, id};
     }
-    else
-    {
-        throw std::runtime_error{"Not accepting"};
-    }
+    throw std::runtime_error{"Not accepting"};
 }
 
 void Timer::stop()
