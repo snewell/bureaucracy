@@ -1,7 +1,10 @@
-set(timer_srcs
-        "${CMAKE_CURRENT_SOURCE_DIR}/timer.cpp"
-    PARENT_SCOPE)
+add_sources(
+    "${CMAKE_CURRENT_LIST_DIR}/timer.cpp"
+)
+add_headers(
+    timer.hpp
+)
 
 create_test(timer_tests
-                timer_test.cpp
-           )
+    "${CMAKE_CURRENT_LIST_DIR}/timer_test.cpp"
+)

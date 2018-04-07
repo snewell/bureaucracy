@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 3.0)
-cmake_policy(VERSION 3.0)
+cmake_minimum_required(VERSION 3.9)
+cmake_policy(VERSION 3.9)
 
 project("bureaucracy"
-        LANGUAGES CXX
-        VERSION 0.2.0)
+    LANGUAGES
+        CXX
+    VERSION
+        0.2.0
+)
 
 include(GNUInstallDirs)
 include(CTest)
@@ -18,30 +21,26 @@ set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 include(CPack)
 
-option(BUILD_TESTS "Build optional tests" ON)
-option(BUILD_DOCS  "Build documenttaion" ON)
+option(BUREAUCRAY_BUILD_TESTS "Build optional tests" ON)
+option(BUREAUCRAY_BUILD_DOCS  "Build documenttaion" ON)
 
 enable_testing()
 
 if(BUILD_TESTS)
-    if(NOT GTEST_FOUND)
-        message(WARNING "Could not find gtest libraries; unit tests disabled")
-        set(BUILD_TESTS OFF)
-    endif()
-endif()
-
-if(BUILD_TESTS)
+    find_package(GTest REQUIRED)
     function(create_test name)
         add_executable(${name} ${ARGN})
         target_link_libraries(${name}
-                                GTest::GTest
-                                GTest::Main
-                                bureaucracy
-                             )
+            GTest::GTest
+            GTest::Main
+            bureaucracy
+        )
         set_target_properties(${name} PROPERTIES
-                                CXX_STANDARD 14
-                                CXX_EXTENSIONS OFF
-                             )
+            CXX_EXTENSIONS OFF
+        )
+        target_compile_features(${name} PRIVATE
+            cxx_std_14
+        )
         add_test(${name} ${name} "--gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${name}_results.xml")
     endfunction()
 else()
@@ -50,42 +49,69 @@ else()
     endfunction()
 endif()
 
-add_subdirectory(timer)
-add_subdirectory(worker)
-
-set(bureaucracy_srcs
-        ${timer_srcs}
-        ${worker_srcs}
-   )
-
-add_library(bureaucracy SHARED ${bureaucracy_srcs})
+add_library(bureaucracy SHARED)
 set_target_properties(bureaucracy PROPERTIES
-                        VERSION ${PROJECT_VERSION}
-                        SOVERSION ${PROJECT_VERSION_MAJOR}
-                     )
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
 target_include_directories(bureaucracy PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-                          )
-target_link_libraries(bureaucracy
-                        PUBLIC Threads::Threads
-                     )
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_link_libraries(bureaucracy PUBLIC
+    Threads::Threads
+)
+target_compile_features(bureaucracy PUBLIC
+    cxx_std_14
+)
 
-add_library(bureaucracy-static STATIC ${bureaucracy_srcs})
+add_library(bureaucracy-static STATIC)
 set_target_properties(bureaucracy-static PROPERTIES
-                        OUTPUT_NAME bureaucracy
-                     )
+    OUTPUT_NAME bureaucracy
+)
 target_include_directories(bureaucracy-static PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-                          )
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_compile_features(bureaucracy-static PUBLIC
+    cxx_std_14
+)
+
 set_target_properties(
+        bureaucracy
+        bureaucracy-static
+    PROPERTIES
+        CXX_EXTENSIONS OFF
+)
+
+function(add_sources)
+    foreach(target
                 bureaucracy
-                bureaucracy-static
-                PROPERTIES
-                    CXX_STANDARD 14
-                    CXX_EXTENSIONS OFF
-                     )
+                bureaucracy-static)
+        target_sources(${target} PRIVATE ${ARGN})
+    endforeach()
+endfunction()
+function(add_headers)
+    foreach(target
+                bureaucracy
+                bureaucracy-static)
+        foreach(header IN LISTS ARGN)
+            set(full_header_path "${CMAKE_CURRENT_SOURCE_DIR}/include/bureaucracy/${header}")
+            list(APPEND all_headers ${full_header_path})
+            target_sources(${target} PUBLIC
+                $<BUILD_INTERFACE:${full_header_path}>
+                $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/bureaucracy/${header}>
+            )
+        endforeach()
+    endforeach()
+    install(FILES ${all_headers}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/bureaucracy
+        COMPONENT ${devComponent}
+    )
+endfunction()
+
+include(timer/CMakeLists.txt)
+include(worker/CMakeLists.txt)
 
 if(BUILD_DOCS)
     find_program(DOXYGEN "doxygen")
@@ -102,9 +128,9 @@ if(BUILD_DOCS)
 
         add_custom_target(docs)
         add_custom_command(TARGET docs
-                                COMMAND "${DOXYGEN}"
-                                WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-                          )
+            COMMAND "${DOXYGEN}"
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        )
     else()
         message(WARNING "Couldn't find doxygen, disabling documentation")
     endif()
@@ -114,39 +140,25 @@ set(runtimeComponent "Runtime")
 set(devComponent "Development")
 
 install(TARGETS
-            bureaucracy
-            bureaucracy-static
-        EXPORT BureaucracyConfig
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${devComponent}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${runtimeComponent}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${runtimeComponent}
-       )
-
-install(FILES
-            include/bureaucracy/diligentworker.hpp
-            include/bureaucracy/expandingthreadpool.hpp
-            include/bureaucracy/priorityworker.hpp
-            include/bureaucracy/serialworker.hpp
-            include/bureaucracy/threadpool.hpp
-            include/bureaucracy/threadpoolbase.hpp
-            include/bureaucracy/timer.hpp
-            include/bureaucracy/worker.hpp
-            include/bureaucracy/workercommon.hpp
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/bureaucracy
-        COMPONENT ${devComponent}
-       )
+        bureaucracy
+        bureaucracy-static
+    EXPORT BureaucracyConfig
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${devComponent}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${runtimeComponent}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${runtimeComponent}
+)
 
 export(TARGETS
-            bureaucracy
-            bureaucracy-static
-        NAMESPACE Bureaucracy::
-        FILE "${CMAKE_CURRENT_BINARY_DIR}/BureaucracyConfig.cmake"
-      )
+        bureaucracy
+        bureaucracy-static
+    NAMESPACE Bureaucracy::
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/BureaucracyConfig.cmake"
+)
 install(EXPORT
-            BureaucracyConfig
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/Bureaucracy/cmake"
-        NAMESPACE Bureaucracy::
-       )
+        BureaucracyConfig
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/Bureaucracy/cmake"
+    NAMESPACE Bureaucracy::
+)
 
 if(PKG_CONFIG_FOUND)
     set(pcFile
@@ -154,20 +166,20 @@ if(PKG_CONFIG_FOUND)
     configure_file(pkg-config.pc.in ${pcFile} @ONLY)
     set(CMAKE_INSTALL_PKGCONFIGDIR "${CMAKE_INSTALL_DATADIR}/pkgconfig")
     install(FILES
-                ${pcFile}
-            DESTINATION ${CMAKE_INSTALL_PKGCONFIGDIR}
-            COMPONENT ${devComponent}
-           )
+            ${pcFile}
+        DESTINATION ${CMAKE_INSTALL_PKGCONFIGDIR}
+        COMPONENT ${devComponent}
+    )
 endif()
 
 if(DOXYGEN)
     install(DIRECTORY
-                "${CMAKE_CURRENT_BINARY_DIR}/doc/html"
-            DESTINATION ${CMAKE_INSTALL_DOCDIR}
-            COMPONENT ${devComponent}
-           )
+            "${CMAKE_CURRENT_BINARY_DIR}/doc/html"
+        DESTINATION ${CMAKE_INSTALL_DOCDIR}
+        COMPONENT ${devComponent}
+    )
 endif()
 install(FILES
-            COPYING
-        DESTINATION ${CMAKE_INSTALL_DOCDIR}
-       )
+        COPYING
+    DESTINATION ${CMAKE_INSTALL_DOCDIR}
+)
