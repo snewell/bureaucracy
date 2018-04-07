@@ -59,6 +59,6 @@ namespace bureaucracy
     private:
         ThreadpoolBase my_threadpool;
     };
-}
+} // namespace bureaucracy
 
 #endif

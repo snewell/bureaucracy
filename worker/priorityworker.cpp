@@ -19,7 +19,7 @@ PriorityWorker::~PriorityWorker() noexcept
 
 void PriorityWorker::add(Work work, Priority priority)
 {
-    my_worker.add([ w = std::move(work), priority ](auto & workQueue) {
+    my_worker.add([w = std::move(work), priority](auto & workQueue) {
         auto it = std::find_if(
             std::begin(workQueue), std::end(workQueue),
             [priority](auto const & p) { return priority < p.priority; });

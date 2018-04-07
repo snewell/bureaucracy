@@ -150,27 +150,24 @@ namespace bureaucracy
     template <typename DATA>
     inline bool WorkerCommon<DATA>::isAccepting() const noexcept
     {
-        return houseguest::synchronize(my_mutex, [this]() {
-            return my_isAccepting;
-        });
+        return houseguest::synchronize(my_mutex,
+                                       [this]() { return my_isAccepting; });
     }
 
     template <typename DATA>
     inline bool WorkerCommon<DATA>::isRunning() const noexcept
     {
-        return houseguest::synchronize(my_mutex, [this]() {
-            return my_isRunning;
-        });
+        return houseguest::synchronize(my_mutex,
+                                       [this]() { return my_isRunning; });
     }
 
     template <typename DATA>
     inline bool WorkerCommon<DATA>::isWorkQueued() const noexcept
     {
-        return houseguest::synchronize(my_mutex, [this]() {
-            return !(my_work.empty());
-        });
+        return houseguest::synchronize(my_mutex,
+                                       [this]() { return !(my_work.empty()); });
     }
     /// \endcond
-}
+} // namespace bureaucracy
 
 #endif

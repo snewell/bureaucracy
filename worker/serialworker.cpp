@@ -16,7 +16,7 @@ SerialWorker::~SerialWorker() noexcept
 
 void SerialWorker::add(Work work)
 {
-    my_worker.add([ w = std::move(work), this ](auto & workQueue) {
+    my_worker.add([w = std::move(work), this](auto & workQueue) {
         workQueue.emplace_back(std::move(w));
         if(workQueue.size() == 1)
         {

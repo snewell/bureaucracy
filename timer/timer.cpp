@@ -103,10 +103,10 @@ Timer::Item Timer::add(Event event, Time due)
             else
             {
                 auto it = std::find_if(std::begin(my_futureEvents),
-                                    std::end(my_futureEvents),
-                                    [due](auto const & currentEvent) {
-                                        return due < currentEvent.due;
-                                    });
+                                       std::end(my_futureEvents),
+                                       [due](auto const & currentEvent) {
+                                           return due < currentEvent.due;
+                                       });
                 my_futureEvents.emplace(it, FutureEvent{id, due});
                 my_events.emplace(id, std::move(event));
                 my_nextFuture = std::begin(my_futureEvents);
@@ -135,31 +135,28 @@ void Timer::stop()
 
 bool Timer::isAccepting() const noexcept
 {
-    return houseguest::synchronize(my_mutex, [this]() {
-        return my_isAccepting;
-    });
+    return houseguest::synchronize(my_mutex,
+                                   [this]() { return my_isAccepting; });
 }
 
 bool Timer::isRunning() const noexcept
 {
-    return houseguest::synchronize(my_mutex, [this]() {
-        return my_isRunning;
-    });
+    return houseguest::synchronize(my_mutex, [this]() { return my_isRunning; });
 }
 
 Timer::Item::CancelStatus Timer::cancel(Timer::Item item)
 {
     return houseguest::synchronize(my_mutex, [this, &item]() {
-        // If we're firing, check the pending events since they haven't been merged
-        // in yet.
+        // If we're firing, check the pending events since they haven't been
+        // merged in yet.
         if(my_isFiring)
         {
             auto const pendingEnd = std::end(my_pendingEvents);
-            auto const pendingIt = std::find_if(
-                std::begin(my_pendingEvents),
-                pendingEnd, [id = item.my_id](auto const & pendingEvent) {
-                    return pendingEvent.event == id;
-                });
+            auto const pendingIt =
+                std::find_if(std::begin(my_pendingEvents), pendingEnd,
+                             [id = item.my_id](auto const & pendingEvent) {
+                                 return pendingEvent.event == id;
+                             });
             if(pendingIt != pendingEnd)
             {
                 my_pendingEvents.erase(pendingIt);
@@ -180,8 +177,8 @@ Timer::Item::CancelStatus Timer::cancel(Timer::Item item)
             return Timer::Item::CancelStatus::cancelled;
         }
 
-        // At this point, we didn't find the item in either queue.  It's either an
-        // invalid id or queued to fire.
+        // At this point, we didn't find the item in either queue.  It's either
+        // an invalid id or queued to fire.
         return Timer::Item::CancelStatus::failed;
     });
 }

@@ -91,6 +91,6 @@ namespace bureaucracy
 
         std::size_t const my_maxBacklog;
     };
-}
+} // namespace bureaucracy
 
 #endif

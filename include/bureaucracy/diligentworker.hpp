@@ -56,6 +56,6 @@ namespace bureaucracy
 
         Alert my_alert;
     };
-}
+} // namespace bureaucracy
 
 #endif

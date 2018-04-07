@@ -36,7 +36,7 @@ namespace
             ++val;
         };
     }
-}
+} // namespace
 
 TEST(SerialWorker, test_workOrder) // NOLINT
 {

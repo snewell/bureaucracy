@@ -12,27 +12,28 @@ namespace
                       std::mutex & mutex,
                       std::vector<bureaucracy::Worker::Work> & work)
     {
-        houseguest::synchronize_unique(mutex, [&accepting, &workReady, &work](auto lock) {
-            while(accepting)
-            {
-                while(!work.empty())
+        houseguest::synchronize_unique(
+            mutex, [&accepting, &workReady, &work](auto lock) {
+                while(accepting)
                 {
-                    auto nextItem = work.front();
-                    work.erase(std::begin(work));
-                    lock.unlock();
-                    nextItem();
-                    lock.lock();
+                    while(!work.empty())
+                    {
+                        auto nextItem = work.front();
+                        work.erase(std::begin(work));
+                        lock.unlock();
+                        nextItem();
+                        lock.lock();
+                    }
+                    if(accepting)
+                    {
+                        // we may have stopped while calling the work functions,
+                        // check before waiting
+                        workReady.wait(lock);
+                    }
                 }
-                if(accepting)
-                {
-                    // we may have stopped while calling the work functions, check
-                    // before waiting
-                    workReady.wait(lock);
-                }
-            }
-        });
+            });
     }
-}
+} // namespace
 
 /// \cond false
 ThreadpoolBase::ThreadpoolBase(std::size_t maxThreads)
@@ -77,7 +78,7 @@ void ThreadpoolBase::stop()
             my_workReady.notify_all();
             lock.unlock();
             std::for_each(std::begin(my_threads), std::end(my_threads),
-                        [](auto & thread) { thread.join(); });
+                          [](auto & thread) { thread.join(); });
             lock.lock();
             my_isRunning = false;
         }
@@ -86,30 +87,25 @@ void ThreadpoolBase::stop()
 
 bool ThreadpoolBase::isAccepting() const noexcept
 {
-    return houseguest::synchronize(my_mutex, [this]() {
-        return my_isAccepting;
-    });
+    return houseguest::synchronize(my_mutex,
+                                   [this]() { return my_isAccepting; });
 }
 
 bool ThreadpoolBase::isRunning() const noexcept
 {
-    return houseguest::synchronize(my_mutex, [this]() {
-        return my_isRunning;
-    });
+    return houseguest::synchronize(my_mutex, [this]() { return my_isRunning; });
 }
 
 std::size_t ThreadpoolBase::getMaxThreads() const noexcept
 {
-    return houseguest::synchronize(my_mutex, [this]() {
-        return my_threads.capacity();
-    });
+    return houseguest::synchronize(my_mutex,
+                                   [this]() { return my_threads.capacity(); });
 }
 
 std::size_t ThreadpoolBase::getAllocatedThreads() const noexcept
 {
-    return houseguest::synchronize(my_mutex, [this]() {
-        return my_threads.size();
-    });
+    return houseguest::synchronize(my_mutex,
+                                   [this]() { return my_threads.size(); });
 }
 
 void ThreadpoolBase::addThread()

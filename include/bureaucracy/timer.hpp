@@ -228,6 +228,6 @@ namespace bureaucracy
     {
         return add(std::move(event), std::chrono::steady_clock::now() + delay);
     }
-}
+} // namespace bureaucracy
 
 #endif

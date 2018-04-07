@@ -46,9 +46,8 @@ TEST(DiligentWorker, test_alert) // NOLINT
     std::condition_variable cond;
     std::mutex mtx;
     DiligentWorker dw{tp, [&cond, &mtx]() {
-                          houseguest::synchronize(mtx, [&cond]() {
-                            cond.notify_one();
-                          });
+                          houseguest::synchronize(
+                              mtx, [&cond]() { cond.notify_one(); });
                       }};
 
     houseguest::synchronize_unique(mtx, [&dw, &cond](auto lock) {

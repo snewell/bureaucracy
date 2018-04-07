@@ -67,7 +67,7 @@ TEST(PriorityWorker, test_addPriority) // NOLINT
     auto value = 0;
     std::mutex m;
     houseguest::synchronize(m, [&value, &pw, &m]() {
-        pw.add(houseguest::make_synchronize(m, []() { }));
+        pw.add(houseguest::make_synchronize(m, []() {}));
         pw.add(
             [&value]() {
                 ASSERT_EQ(5, value);

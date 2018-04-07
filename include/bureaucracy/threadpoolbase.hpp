@@ -70,6 +70,6 @@ namespace bureaucracy
         });
     }
     /// \endcond
-}
+} // namespace bureaucracy
 
 #endif

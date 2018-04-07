@@ -41,6 +41,6 @@ namespace bureaucracy
     private:
         WorkerCommon<Work> my_worker;
     };
-}
+} // namespace bureaucracy
 
 #endif

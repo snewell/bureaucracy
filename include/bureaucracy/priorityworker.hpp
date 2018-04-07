@@ -90,6 +90,6 @@ namespace bureaucracy
     {
         work();
     }
-}
+} // namespace bureaucracy
 
 #endif

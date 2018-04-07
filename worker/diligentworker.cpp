@@ -17,7 +17,7 @@ DiligentWorker::~DiligentWorker() noexcept
 
 void DiligentWorker::add(Work work)
 {
-    my_worker.addDirect([ w = std::move(work), this ]() {
+    my_worker.addDirect([w = std::move(work), this]() {
         w();
         if(!my_worker.isWorkQueued())
         {

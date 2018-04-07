@@ -51,6 +51,6 @@ namespace bureaucracy
         virtual ~Worker() noexcept = default;
         /// \endcond
     };
-}
+} // namespace bureaucracy
 
 #endif
