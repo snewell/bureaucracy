@@ -14,6 +14,7 @@ include(CTest)
 find_package(GTest)
 find_package(PkgConfig)
 find_package(Threads REQUIRED)
+find_package(Houseguest REQUIRED)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
@@ -58,8 +59,9 @@ target_include_directories(bureaucracy PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
-target_link_libraries(bureaucracy PUBLIC
-    Threads::Threads
+target_link_libraries(bureaucracy
+    PUBLIC Threads::Threads
+    PUBLIC Houseguest::houseguest
 )
 target_compile_features(bureaucracy PUBLIC
     cxx_std_14
@@ -72,6 +74,9 @@ set_target_properties(bureaucracy-static PROPERTIES
 target_include_directories(bureaucracy-static PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_link_libraries(bureaucracy-static
+    PUBLIC Houseguest::houseguest
 )
 target_compile_features(bureaucracy-static PUBLIC
     cxx_std_14

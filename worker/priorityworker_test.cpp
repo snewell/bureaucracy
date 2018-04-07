@@ -5,6 +5,8 @@
 #include <bureaucracy/priorityworker.hpp>
 #include <bureaucracy/threadpool.hpp>
 
+#include <houseguest/synchronize.hpp>
+
 using bureaucracy::PriorityWorker;
 using bureaucracy::Threadpool;
 
@@ -64,10 +66,8 @@ TEST(PriorityWorker, test_addPriority) // NOLINT
 
     auto value = 0;
     std::mutex m;
-    {
-        std::lock_guard<std::mutex> outerLock{m};
-
-        pw.add([&m]() { std::unique_lock<std::mutex> innerLock{m}; });
+    houseguest::synchronize(m, [&value, &pw, &m]() {
+        pw.add(houseguest::make_synchronize(m, []() { }));
         pw.add(
             [&value]() {
                 ASSERT_EQ(5, value);
@@ -80,7 +80,7 @@ TEST(PriorityWorker, test_addPriority) // NOLINT
                 value = 5;
             },
             10);
-    }
+    });
     pw.stop();
     ASSERT_EQ(10, value);
 }

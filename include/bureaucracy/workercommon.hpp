@@ -7,6 +7,8 @@
 
 #include <bureaucracy/worker.hpp>
 
+#include <houseguest/synchronize.hpp>
+
 namespace bureaucracy
 {
     template <typename DATA>
@@ -66,16 +68,16 @@ namespace bureaucracy
     template <typename ADDFN>
     inline void WorkerCommon<DATA>::add(ADDFN const & addFn)
     {
-        std::lock_guard<std::mutex> lock{my_mutex};
-
-        if(my_isAccepting)
-        {
-            addFn(my_work);
-        }
-        else
-        {
-            throw std::runtime_error{"Not accepting work"};
-        }
+        houseguest::synchronize(my_mutex, [this, &addFn]() {
+            if(my_isAccepting)
+            {
+                addFn(my_work);
+            }
+            else
+            {
+                throw std::runtime_error{"Not accepting work"};
+            }
+        });
     }
 
     template <typename DATA>
@@ -95,72 +97,78 @@ namespace bureaucracy
     template <typename DATA>
     inline void WorkerCommon<DATA>::executeAll() noexcept
     {
-        std::unique_lock<std::mutex> lock{my_mutex};
-        while(!my_work.empty())
-        {
-            auto nextItem = my_work.front();
-            my_work.erase(std::begin(my_work));
-            lock.unlock();
-            nextItem();
-            lock.lock();
-        }
-        my_isEmpty.notify_one();
+        houseguest::synchronize_unique(my_mutex, [this](auto lock) {
+            while(!my_work.empty())
+            {
+                auto nextItem = my_work.front();
+                my_work.erase(std::begin(my_work));
+                lock.unlock();
+                nextItem();
+                lock.lock();
+            }
+            my_isEmpty.notify_one();
+        });
     }
 
     template <typename DATA>
     inline void WorkerCommon<DATA>::stop()
     {
-        std::unique_lock<std::mutex> lock{my_mutex};
-
-        if(my_isAccepting)
-        {
-            my_isAccepting = false;
-            if(!my_work.empty())
+        houseguest::synchronize_unique(my_mutex, [this](auto lock) {
+            if(my_isAccepting)
             {
-                my_isEmpty.wait(lock);
+                my_isAccepting = false;
+                if(!my_work.empty())
+                {
+                    my_isEmpty.wait(lock);
+                }
+                my_isRunning = false;
             }
-            my_isRunning = false;
-        }
+        });
     }
 
     template <typename DATA>
     inline void WorkerCommon<DATA>::notifyIfEmpty() noexcept
     {
-        std::unique_lock<std::mutex> lock{my_mutex};
-        if(my_work.empty())
-        {
-            my_isEmpty.notify_all();
-        }
+        houseguest::synchronize(my_mutex, [this]() {
+            if(my_work.empty())
+            {
+                my_isEmpty.notify_all();
+            }
+        });
     }
 
     template <typename DATA>
     inline DATA WorkerCommon<DATA>::getNextItem() noexcept
     {
-        std::lock_guard<std::mutex> lock{my_mutex};
-        auto ret = my_work.front();
-        my_work.erase(std::begin(my_work));
-        return ret;
+        return houseguest::synchronize(my_mutex, [this]() {
+            auto ret = my_work.front();
+            my_work.erase(std::begin(my_work));
+            return ret;
+        });
     }
 
     template <typename DATA>
     inline bool WorkerCommon<DATA>::isAccepting() const noexcept
     {
-        std::lock_guard<std::mutex> lock{my_mutex};
-        return my_isAccepting;
+        return houseguest::synchronize(my_mutex, [this]() {
+            return my_isAccepting;
+        });
     }
 
     template <typename DATA>
     inline bool WorkerCommon<DATA>::isRunning() const noexcept
     {
-        std::lock_guard<std::mutex> lock{my_mutex};
-        return my_isRunning;
+        return houseguest::synchronize(my_mutex, [this]() {
+            return my_isRunning;
+        });
     }
 
     template <typename DATA>
     inline bool WorkerCommon<DATA>::isWorkQueued() const noexcept
     {
-        std::lock_guard<std::mutex> lock{my_mutex};
-        return !(my_work.empty());
+        return houseguest::synchronize(my_mutex, [this]() {
+            return !(my_work.empty());
+        });
     }
     /// \endcond
 }

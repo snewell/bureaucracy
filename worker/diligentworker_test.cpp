@@ -5,6 +5,8 @@
 #include <bureaucracy/diligentworker.hpp>
 #include <bureaucracy/threadpool.hpp>
 
+#include <houseguest/synchronize.hpp>
+
 using bureaucracy::DiligentWorker;
 using bureaucracy::Threadpool;
 
@@ -44,16 +46,18 @@ TEST(DiligentWorker, test_alert) // NOLINT
     std::condition_variable cond;
     std::mutex mtx;
     DiligentWorker dw{tp, [&cond, &mtx]() {
-                          std::lock_guard<std::mutex> lock{mtx};
-                          cond.notify_one();
+                          houseguest::synchronize(mtx, [&cond]() {
+                            cond.notify_one();
+                          });
                       }};
 
-    std::unique_lock<std::mutex> lock{mtx};
-    std::promise<void> hit;
-    dw.add([&hit]() { hit.set_value(); });
-    hit.get_future().get();
+    houseguest::synchronize_unique(mtx, [&dw, &cond](auto lock) {
+        std::promise<void> hit;
+        dw.add([&hit]() { hit.set_value(); });
+        hit.get_future().get();
 
-    cond.wait(lock);
+        cond.wait(lock);
+    });
 }
 
 TEST(NegativeDiligentWorker, test_addStopped) // NOLINT

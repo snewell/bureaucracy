@@ -8,6 +8,8 @@
 
 #include <bureaucracy/worker.hpp>
 
+#include <houseguest/synchronize.hpp>
+
 namespace bureaucracy
 {
     /** \internal
@@ -60,11 +62,12 @@ namespace bureaucracy
     template <typename PREDICATE>
     inline void ThreadpoolBase::addThreadIf(PREDICATE const & pred)
     {
-        std::lock_guard<std::mutex> lock{my_mutex};
-        if(pred(my_work, my_threads))
-        {
-            addThread();
-        }
+        houseguest::synchronize(my_mutex, [this, &pred]() {
+            if(pred(my_work, my_threads))
+            {
+                addThread();
+            }
+        });
     }
     /// \endcond
 }

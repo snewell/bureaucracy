@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <houseguest/synchronize.hpp>
+
 using bureaucracy::ThreadpoolBase;
 
 namespace
@@ -10,25 +12,25 @@ namespace
                       std::mutex & mutex,
                       std::vector<bureaucracy::Worker::Work> & work)
     {
-        std::unique_lock<std::mutex> lock{mutex};
-
-        while(accepting)
-        {
-            while(!work.empty())
+        houseguest::synchronize_unique(mutex, [&accepting, &workReady, &work](auto lock) {
+            while(accepting)
             {
-                auto nextItem = work.front();
-                work.erase(std::begin(work));
-                lock.unlock();
-                nextItem();
-                lock.lock();
+                while(!work.empty())
+                {
+                    auto nextItem = work.front();
+                    work.erase(std::begin(work));
+                    lock.unlock();
+                    nextItem();
+                    lock.lock();
+                }
+                if(accepting)
+                {
+                    // we may have stopped while calling the work functions, check
+                    // before waiting
+                    workReady.wait(lock);
+                }
             }
-            if(accepting)
-            {
-                // we may have stopped while calling the work functions, check
-                // before waiting
-                workReady.wait(lock);
-            }
-        }
+        });
     }
 }
 
@@ -53,56 +55,61 @@ ThreadpoolBase::~ThreadpoolBase() noexcept
 
 void ThreadpoolBase::add(Worker::Work work)
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-
-    if(my_isAccepting)
-    {
-        my_work.emplace_back(std::move(work));
-        my_workReady.notify_one();
-    }
-    else
-    {
-        throw std::runtime_error{"Not accepting work"};
-    }
+    houseguest::synchronize(my_mutex, [this, &work]() {
+        if(my_isAccepting)
+        {
+            my_work.emplace_back(std::move(work));
+            my_workReady.notify_one();
+        }
+        else
+        {
+            throw std::runtime_error{"Not accepting work"};
+        }
+    });
 }
 
 void ThreadpoolBase::stop()
 {
-    std::unique_lock<std::mutex> lock{my_mutex};
-    if(my_isAccepting)
-    {
-        my_isAccepting = false;
-        my_workReady.notify_all();
-        lock.unlock();
-        std::for_each(std::begin(my_threads), std::end(my_threads),
-                      [](auto & thread) { thread.join(); });
-        lock.lock();
-        my_isRunning = false;
-    }
+    houseguest::synchronize_unique(my_mutex, [this](auto lock) {
+        if(my_isAccepting)
+        {
+            my_isAccepting = false;
+            my_workReady.notify_all();
+            lock.unlock();
+            std::for_each(std::begin(my_threads), std::end(my_threads),
+                        [](auto & thread) { thread.join(); });
+            lock.lock();
+            my_isRunning = false;
+        }
+    });
 }
 
 bool ThreadpoolBase::isAccepting() const noexcept
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-    return my_isAccepting;
+    return houseguest::synchronize(my_mutex, [this]() {
+        return my_isAccepting;
+    });
 }
 
 bool ThreadpoolBase::isRunning() const noexcept
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-    return my_isRunning;
+    return houseguest::synchronize(my_mutex, [this]() {
+        return my_isRunning;
+    });
 }
 
 std::size_t ThreadpoolBase::getMaxThreads() const noexcept
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-    return my_threads.capacity();
+    return houseguest::synchronize(my_mutex, [this]() {
+        return my_threads.capacity();
+    });
 }
 
 std::size_t ThreadpoolBase::getAllocatedThreads() const noexcept
 {
-    std::lock_guard<std::mutex> lock{my_mutex};
-    return my_threads.size();
+    return houseguest::synchronize(my_mutex, [this]() {
+        return my_threads.size();
+    });
 }
 
 void ThreadpoolBase::addThread()
