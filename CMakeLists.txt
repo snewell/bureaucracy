@@ -27,7 +27,7 @@ option(BUREAUCRAY_BUILD_DOCS  "Build documenttaion" ON)
 
 enable_testing()
 
-if(BUILD_TESTS)
+if(BUREAUCRAY_BUILD_TESTS)
     find_package(GTest REQUIRED)
     function(create_test name)
         add_executable(${name} ${ARGN})
