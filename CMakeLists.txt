@@ -11,6 +11,8 @@ project("bureaucracy"
 include(GNUInstallDirs)
 include(CTest)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+
 find_package(GTest)
 find_package(PkgConfig)
 find_package(Threads REQUIRED)
@@ -147,7 +149,7 @@ set(devComponent "Development")
 install(TARGETS
         bureaucracy
         bureaucracy-static
-    EXPORT BureaucracyConfig
+    EXPORT BureaucracyTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${devComponent}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${runtimeComponent}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${runtimeComponent}
@@ -157,12 +159,22 @@ export(TARGETS
         bureaucracy
         bureaucracy-static
     NAMESPACE Bureaucracy::
-    FILE "${CMAKE_CURRENT_BINARY_DIR}/BureaucracyConfig.cmake"
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/BureaucracyTargets.cmake"
 )
 install(EXPORT
-        BureaucracyConfig
+        BureaucracyTargets
     DESTINATION "${CMAKE_INSTALL_DATADIR}/Bureaucracy/cmake"
     NAMESPACE Bureaucracy::
+)
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/BureaucracyConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/BureaucracyConfig.cmake"
+    COPYONLY
+)
+install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/BureaucracyConfig.cmake"
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/Bureaucracy/cmake"
 )
 
 if(PKG_CONFIG_FOUND)
