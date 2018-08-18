@@ -40,6 +40,7 @@ Timer::Timer()
                         auto it = my_events.find(futureEvent.event);
                         assert(it != my_events.end());
                         it->second();
+                        my_events.erase(it);
                     });
                     lock.lock();
                     my_isFiring = false;
@@ -162,24 +163,28 @@ Timer::Item::CancelStatus Timer::cancel(Timer::Item item)
                 my_pendingEvents.erase(pendingIt);
                 return Timer::Item::CancelStatus::cancelled;
             }
+            return Timer::Item::CancelStatus::failed;
         }
-
-        // We need to the check the future events whether we're firing or not.
-        auto const end = std::end(my_futureEvents);
-        auto futureIt = std::find_if(
-            my_nextFuture, end, [id = item.my_id](auto const & futureEvent) {
-                return futureEvent.event == id;
-            });
-        if(futureIt != end)
+        else
         {
-            my_futureEvents.erase(futureIt);
-            my_events.erase(item.my_id);
-            return Timer::Item::CancelStatus::cancelled;
-        }
+            // If we're not firing, then the other queues can be checked
+            auto const end = std::end(my_futureEvents);
+            auto futureIt =
+                std::find_if(my_nextFuture, end,
+                             [id = item.my_id](auto const & futureEvent) {
+                                 return futureEvent.event == id;
+                             });
+            if(futureIt != end)
+            {
+                my_futureEvents.erase(futureIt);
+                my_events.erase(item.my_id);
+                return Timer::Item::CancelStatus::cancelled;
+            }
 
-        // At this point, we didn't find the item in either queue.  It's either
-        // an invalid id or queued to fire.
-        return Timer::Item::CancelStatus::failed;
+            // At this point, we didn't find the item in either queue.  It's
+            // either an invalid id or queued to fire.
+            return Timer::Item::CancelStatus::failed;
+        }
     });
 }
 

@@ -234,7 +234,7 @@ TEST(Timer, test_cancelFiring) // NOLINT
         std::chrono::milliseconds(100));
 
     hit.get_future().get();
-    ASSERT_EQ(Timer::Item::CancelStatus::cancelled, cancelStatus);
+    ASSERT_EQ(Timer::Item::CancelStatus::failed, cancelStatus);
 }
 
 TEST(Timer, test_cancelPending) // NOLINT
