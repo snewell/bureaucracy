@@ -163,7 +163,7 @@ export(TARGETS
 )
 install(EXPORT
         BureaucracyTargets
-    DESTINATION "${CMAKE_INSTALL_DATADIR}/Bureaucracy/cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/Bureaucracy/cmake"
     NAMESPACE Bureaucracy::
 )
 
@@ -174,14 +174,14 @@ configure_file(
 )
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/BureaucracyConfig.cmake"
-    DESTINATION "${CMAKE_INSTALL_DATADIR}/Bureaucracy/cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/Bureaucracy/cmake"
 )
 
 if(PKG_CONFIG_FOUND)
     set(pcFile
         "${CMAKE_CURRENT_BINARY_DIR}/bureaucracy-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.pc")
     configure_file(pkg-config.pc.in ${pcFile} @ONLY)
-    set(CMAKE_INSTALL_PKGCONFIGDIR "${CMAKE_INSTALL_DATADIR}/pkgconfig")
+    set(CMAKE_INSTALL_PKGCONFIGDIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
     install(FILES
             ${pcFile}
         DESTINATION ${CMAKE_INSTALL_PKGCONFIGDIR}
